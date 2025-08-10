@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASCII Pattern Engine Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #000;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+        }
+        
+        #canvas {
+            border: 1px solid #00ff00;
+            background-color: #000;
+        }
+        
+        .controls {
+            margin-top: 20px;
+        }
+        
+        button {
+            background-color: transparent;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 10px 20px;
+            margin-right: 10px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        
+        button:hover {
+            background-color: #00ff00;
+            color: #000;
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #00ff00;
+            background-color: rgba(0, 255, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>ASCII Pattern Engine Test</h1>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    
+    <div class="controls">
+        <button onclick="startTest()">Start Test</button>
+        <button onclick="stopTest()">Stop Test</button>
+        <button onclick="resizeTest()">Resize Test</button>
+    </div>
+    
+    <div class="status" id="status">
+        Ready to test. Click "Start Test" to begin.
+    </div>
+
+    <script>
+        // Simple JavaScript test for the engine functionality
+        // This simulates the TypeScript classes in plain JavaScript
+        
+        class SimpleTestPattern {
+            constructor(ctx, config) {
+                this.ctx = ctx;
+                this.config = config;
+                this.name = 'simple-test';
+                this.isInitialized = false;
+                this.position = { x: 0, y: 0 };
+                this.chars = config.characters || '01';
+                this.gridWidth = 0;
+                this.gridHeight = 0;
+                this.charWidth = 8;
+                this.charHeight = 12;
+            }
+            
+            initialize() {
+                this.isInitialized = true;
+                this.position = { x: 0, y: 0 };
+                this.calculateGrid();
+                updateStatus('Pattern initialized');
+            }
+            
+            calculateGrid() {
+                this.charWidth = 8; // Approximate
+                this.charHeight = 12; // Approximate
+                this.gridWidth = Math.floor(this.ctx.canvas.width / this.charWidth);
+                this.gridHeight = Math.floor(this.ctx.canvas.height / this.charHeight);
+            }
+            
+            update(deltaTime) {
+                if (!this.isInitialized) return;
+                
+                this.position.x += deltaTime * 0.01;
+                if (this.position.x >= this.gridWidth) {
+                    this.position.x = 0;
+                    this.position.y = (this.position.y + 1) % this.gridHeight;
+                }
+            }
+            
+            render() {
+                if (!this.isInitialized) return;
+                
+                // Clear canvas
+                this.ctx.fillStyle = '#000000';
+                this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+                
+                // Draw character
+                this.ctx.fillStyle = '#00ff00';
+                this.ctx.font = '12px Courier New';
+                this.ctx.textBaseline = 'top';
+                
+                const char = this.chars[Math.floor(Math.random() * this.chars.length)];
+                const x = Math.floor(this.position.x) * this.charWidth;
+                const y = this.position.y * this.charHeight;
+                
+                this.ctx.fillText(char, x, y);
+            }
+            
+            cleanup() {
+                this.isInitialized = false;
+                updateStatus('Pattern cleaned up');
+            }
+            
+            onResize(gridWidth, gridHeight) {
+                this.gridWidth = gridWidth;
+                this.gridHeight = gridHeight;
+                updateStatus(`Resized to ${gridWidth}x${gridHeight}`);
+            }
+        }
+        
+        class SimpleEngine {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.currentPattern = null;
+                this.animationId = null;
+                this.lastFrameTime = 0;
+                
+                if (!this.ctx) {
+                    throw new Error('Canvas 2D context not supported');
+                }
+                
+                updateStatus('Engine initialized');
+            }
+            
+            registerPattern(name, patternClass) {
+                this.patternClass = patternClass;
+                updateStatus(`Pattern ${name} registered`);
+            }
+            
+            async switchPattern(name, config = {}) {
+                if (this.currentPattern) {
+                    this.currentPattern.cleanup();
+                }
+                
+                this.currentPattern = new this.patternClass(this.ctx, config);
+                this.currentPattern.initialize();
+                updateStatus(`Switched to pattern: ${name}`);
+            }
+            
+            startAnimation() {
+                if (this.animationId !== null) return;
+                
+                this.lastFrameTime = performance.now();
+                
+                const animate = (currentTime) => {
+                    const deltaTime = currentTime - this.lastFrameTime;
+                    this.lastFrameTime = currentTime;
+                    
+                    if (this.currentPattern) {
+                        this.currentPattern.update(deltaTime);
+                        this.currentPattern.render();
+                    }
+                    
+                    this.animationId = requestAnimationFrame(animate);
+                };
+                
+                this.animationId = requestAnimationFrame(animate);
+                updateStatus('Animation started');
+            }
+            
+            stopAnimation() {
+                if (this.animationId !== null) {
+                    cancelAnimationFrame(this.animationId);
+                    this.animationId = null;
+                    updateStatus('Animation stopped');
+                }
+            }
+            
+            resize(width, height) {
+                this.canvas.width = width || this.canvas.parentElement.clientWidth;
+                this.canvas.height = height || this.canvas.parentElement.clientHeight;
+                
+                // Recalculate grid
+                if (this.currentPattern && this.currentPattern.onResize) {
+                    const gridWidth = Math.floor(this.canvas.width / 8);
+                    const gridHeight = Math.floor(this.canvas.height / 12);
+                    this.currentPattern.onResize(gridWidth, gridHeight);
+                }
+            }
+            
+            cleanup() {
+                this.stopAnimation();
+                if (this.currentPattern) {
+                    this.currentPattern.cleanup();
+                    this.currentPattern = null;
+                }
+                updateStatus('Engine cleaned up');
+            }
+        }
+        
+        let engine = null;
+        
+        function updateStatus(message) {
+            const status = document.getElementById('status');
+            const timestamp = new Date().toLocaleTimeString();
+            status.innerHTML = `[${timestamp}] ${message}`;
+            console.log(`[${timestamp}] ${message}`);
+        }
+        
+        function startTest() {
+            try {
+                const canvas = document.getElementById('canvas');
+                
+                if (engine) {
+                    engine.cleanup();
+                }
+                
+                engine = new SimpleEngine(canvas);
+                engine.registerPattern('test', SimpleTestPattern);
+                
+                engine.switchPattern('test', {
+                    characters: '01#*+-.=<>[]{}()',
+                    speed: 'medium'
+                });
+                
+                engine.startAnimation();
+                
+            } catch (error) {
+                updateStatus(`Error: ${error.message}`);
+            }
+        }
+        
+        function stopTest() {
+            if (engine) {
+                engine.stopAnimation();
+            }
+        }
+        
+        function resizeTest() {
+            if (engine) {
+                engine.resize(600, 400);
+                updateStatus('Canvas resized to 600x400');
+            }
+        }
+        
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            updateStatus('Page loaded. Ready for testing.');
+        });
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (engine) {
+                engine.cleanup();
+            }
+        });
+    </script>
+</body>
+</html>
