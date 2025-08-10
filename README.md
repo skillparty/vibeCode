@@ -1,4 +1,4 @@
-# 🌊 vibeCode - ASCII Screensaver
+#  vibeCode - ASCII Screensaver
 
 > "The Way of Code" - A philosophical ASCII screensaver that displays programming wisdom through mesmerizing animated patterns.
 
@@ -20,23 +20,23 @@ public/
 └── index.html     # HTML template with semantic structure and ARIA labels
 ```
 
-## ✨ Key Features
+##  Key Features
 
-- 🎨 **Dynamic ASCII Pattern Engine** - Customizable pattern animations with Canvas 2D rendering
-- 📚 **Programming Philosophy Quotes** - Curated wisdom from coding masters
-- 🎭 **Multiple Visual Themes** - Matrix, Terminal, Retro, and Blue themes
-- 📱 **Responsive Design** - Adapts to any screen size with intelligent grid calculation
-- ♿ **Accessibility Support** - Full ARIA compliance and screen reader support
-- 🔧 **Extensible Architecture** - Easy to add new patterns and effects
+-  **Dynamic ASCII Pattern Engine** - Customizable pattern animations with Canvas 2D rendering
+-  **Programming Philosophy Quotes** - Curated wisdom from coding masters
+-  **Multiple Visual Themes** - Matrix, Terminal, Retro, and Blue themes
+-  **Responsive Design** - Adapts to any screen size with intelligent grid calculation
+-  **Accessibility Support** - Full ARIA compliance and screen reader support
+-  **Extensible Architecture** - Easy to add new patterns and effects
 - **Semantic HTML Structure**: Uses proper HTML5 semantic elements (main, section, article, nav, aside)
 - **TypeScript Support**: Fully typed with interfaces for Pattern, Quote, and Configuration
 - **Performance Optimized**: Built for 60fps animations with minimal resource usage
 
-## 🚀 Current Implementation Status
+## � Current Implementation Status
 
-### ✅ Completed Tasks
+###  Completed Tasks
 
-**Task 2: Base ASCII Pattern Engine and Canvas Setup**
+**Task : Base ASCII Pattern Engine and Canvas Setup**
 - ASCIIPatternEngine class with Canvas 2D context initialization
 - BasePattern abstract class with Pattern interface
 - Canvas resize handling and responsive grid calculation
@@ -44,7 +44,7 @@ public/
 - React component integration (ASCIICanvas)
 - Error handling and accessibility features
 
-### 🎯 Technical Highlights
+###  Technical Highlights
 
 - **Canvas 2D Integration**: Optimized rendering with requestAnimationFrame
 - **Pattern Management**: Dynamic pattern registration and switching
@@ -74,7 +74,7 @@ public/
 - Reduced motion support for users with motion sensitivity
 - High contrast focus indicators
 
-## 🔮 Next Steps
+##  Next Steps
 
 Based on the implementation plan, upcoming tasks include:
 - Matrix rain pattern implementation
@@ -83,12 +83,9 @@ Based on the implementation plan, upcoming tasks include:
 - Transition effects
 - Configuration management
 
-## 🤝 Contributing
+##  Contributing
 
-This project follows spec-driven development. Check the `.kiro/specs/ascii-screensaver/` directory for:
-- `requirements.md` - Feature requirements
-- `design.md` - Technical design
-- `tasks.md` - Implementation roadmap
+This project follows spec-driven development. 
 
 ## Requirements Addressed
 
