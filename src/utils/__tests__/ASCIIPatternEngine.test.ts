@@ -8,6 +8,7 @@ class MockCanvasRenderingContext2D {
   textBaseline = 'top';
   textAlign = 'left';
   fillStyle = '#000000';
+  canvas = { width: 800, height: 600 };
   
   measureText = jest.fn().mockReturnValue({ width: 8 });
   fillRect = jest.fn();
@@ -52,8 +53,8 @@ describe('ASCIIPatternEngine', () => {
   
   beforeEach(() => {
     canvas = new MockCanvas();
+    // Don't clear mocks before creating engine so we can test getContext call
     engine = new ASCIIPatternEngine(canvas as any);
-    jest.clearAllMocks();
   });
   
   afterEach(() => {

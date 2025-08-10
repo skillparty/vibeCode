@@ -1,4 +1,7 @@
 import { Pattern, PatternConfig, TransitionState } from '../types';
+import { MatrixRain } from './MatrixRain';
+import { BinaryWaves } from './BinaryWaves';
+import { GeometricFlow } from './GeometricFlow';
 
 export interface EngineConfig {
   fontSize: number;
@@ -46,6 +49,9 @@ export class ASCIIPatternEngine {
     
     this.initializeCanvas();
     this.setupResizeHandling();
+    
+    // Register built-in patterns
+    this.registerBuiltInPatterns();
   }
   
   /**
@@ -328,6 +334,15 @@ export class ASCIIPatternEngine {
     }
   }
   
+  /**
+   * Register built-in patterns
+   */
+  private registerBuiltInPatterns(): void {
+    this.registerPattern('matrix-rain', MatrixRain);
+    this.registerPattern('binary-waves', BinaryWaves);
+    this.registerPattern('geometric-flow', GeometricFlow);
+  }
+
   /**
    * Clean up resources
    */

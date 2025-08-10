@@ -15,7 +15,7 @@
   - Write unit tests for engine initialization and basic canvas operations
   - _Requirements: 1.1, 1.5, 5.3_
 
-- [ ] 3. Create Matrix Rain ASCII pattern implementation
+- [x] 3. Create Matrix Rain ASCII pattern implementation
 
   - Implement MatrixRain class extending BasePattern with falling character animation
   - Add character selection logic using programming symbols (0,1,{},[],(),(,\*,+,etc.)
@@ -24,7 +24,7 @@
   - Write unit tests for Matrix Rain pattern behavior
   - _Requirements: 1.2, 1.3, 1.5_
 
-- [ ] 4. Implement Binary Waves and Geometric ASCII patterns
+- [x] 4. Implement Binary Waves and Geometric ASCII patterns
 
   - Create BinaryWaves class with sine wave animation using 0s and 1s
   - Implement GeometricFlow class with geometric shapes using ASCII characters (/, \, |, -, +)
