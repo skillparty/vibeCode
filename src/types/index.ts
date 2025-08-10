@@ -59,8 +59,29 @@ export interface ScreensaverState {
 
 export interface TransitionState {
   type: 'idle' | 'transitioning';
-  effect: string;
+  effect: 'fade' | 'morph' | 'displacement' | 'glitch' | 'slide' | 'rotate3d';
   progress: number;
+  duration: number;
   fromPattern?: string;
   toPattern?: string;
+  startTime?: number;
+}
+
+export interface RenderLayer {
+  name: string;
+  zIndex: number;
+  opacity: number;
+  blendMode: GlobalCompositeOperation;
+  pattern?: Pattern;
+  canvas?: HTMLCanvasElement;
+  ctx?: CanvasRenderingContext2D;
+}
+
+export interface TransitionConfig {
+  type: 'fade' | 'morph' | 'displacement' | 'glitch' | 'slide' | 'rotate3d';
+  duration: number;
+  easing: 'linear' | 'ease-in' | 'ease-out' | 'ease-in-out';
+  glitchIntensity?: number;
+  morphSteps?: number;
+  displacementAmount?: number;
 }

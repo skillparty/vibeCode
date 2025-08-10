@@ -33,7 +33,7 @@
   - Write unit tests for both pattern implementations
   - _Requirements: 1.2, 1.3_
 
-- [ ] 5. Add remaining ASCII patterns (Terminal, Code Flow, Mandelbrot, Conway, Network)
+- [x] 5. Add remaining ASCII patterns (Terminal, Code Flow, Mandelbrot, Conway, Network)
 
   - Implement TerminalCursor class with blinking cursor and typing effects
   - Create CodeFlow class with simulated code scrolling animation
@@ -43,7 +43,7 @@
   - Write comprehensive unit tests for all pattern implementations
   - _Requirements: 1.2, 1.3_
 
-- [ ] 6. Create pattern transition system and multi-layer rendering
+- [x] 6. Create pattern transition system and multi-layer rendering
 
   - Implement pattern switching logic with smooth transitions (fade, morph, displacement)
   - Add multi-layer rendering system (background, middle, foreground layers)

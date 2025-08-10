@@ -1,7 +1,15 @@
-import { Pattern, PatternConfig, TransitionState } from '../types';
+import { Pattern, PatternConfig, TransitionState, TransitionConfig } from '../types';
 import { MatrixRain } from './MatrixRain';
 import { BinaryWaves } from './BinaryWaves';
 import { GeometricFlow } from './GeometricFlow';
+import { TerminalCursor } from './TerminalCursor';
+import { CodeFlow } from './CodeFlow';
+import { MandelbrotASCII } from './MandelbrotASCII';
+import { ConwayLife } from './ConwayLife';
+import { NetworkNodes } from './NetworkNodes';
+import { TransitionManager } from './TransitionManager';
+import { LayerManager } from './LayerManager';
+import { PatternSynchronizer } from './PatternSynchronizer';
 
 export interface EngineConfig {
   fontSize: number;
@@ -15,11 +23,17 @@ export class ASCIIPatternEngine {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private currentPattern: Pattern | null = null;
-  private transitionState: TransitionState = { type: 'idle', effect: '', progress: 0 };
+  private transitionState: TransitionState = { type: 'idle', effect: 'fade', progress: 0, duration: 1000 };
   private patterns: Map<string, new (ctx: CanvasRenderingContext2D, config: PatternConfig) => Pattern> = new Map();
   private animationId: number | null = null;
   private lastFrameTime: number = 0;
   private config: EngineConfig;
+  
+  // New managers for advanced features
+  private transitionManager: TransitionManager;
+  private layerManager: LayerManager;
+  private synchronizer: PatternSynchronizer;
+  private useMultiLayer: boolean = false;
   
   // Grid properties for responsive ASCII rendering
   private gridWidth: number = 0;
@@ -46,6 +60,11 @@ export class ASCIIPatternEngine {
       enableDebug: false,
       ...config
     };
+    
+    // Initialize managers
+    this.transitionManager = new TransitionManager(canvas, ctx);
+    this.layerManager = new LayerManager(canvas, ctx);
+    this.synchronizer = new PatternSynchronizer(120); // 120 BPM default
     
     this.initializeCanvas();
     this.setupResizeHandling();
@@ -145,6 +164,9 @@ export class ASCIIPatternEngine {
     this.ctx.textBaseline = 'top';
     this.ctx.textAlign = 'left';
     
+    // Resize layer manager canvases
+    this.layerManager.resize(newWidth, newHeight);
+    
     // Notify current pattern of resize
     if (this.currentPattern && 'onResize' in this.currentPattern) {
       (this.currentPattern as any).onResize(this.gridWidth, this.gridHeight);
@@ -172,9 +194,13 @@ export class ASCIIPatternEngine {
   }
   
   /**
-   * Switch to a different pattern with optional transition
+   * Switch to a different pattern with advanced transition
    */
-  public switchPattern(patternName: string, transitionType: string = 'fade', patternConfig: PatternConfig = {} as PatternConfig): Promise<void> {
+  public switchPattern(
+    patternName: string, 
+    transitionConfig: Partial<TransitionConfig> = {}, 
+    patternConfig: PatternConfig = {} as PatternConfig
+  ): Promise<void> {
     return new Promise((resolve, reject) => {
       const PatternClass = this.patterns.get(patternName);
       if (!PatternClass) {
@@ -183,30 +209,45 @@ export class ASCIIPatternEngine {
       }
       
       try {
-        // Clean up current pattern
-        if (this.currentPattern) {
-          this.currentPattern.cleanup();
-        }
-        
+        const fullTransitionConfig: TransitionConfig = {
+          type: 'fade',
+          duration: 1000,
+          easing: 'ease-in-out',
+          ...transitionConfig
+        };
+
         // Create new pattern instance
         const newPattern = new PatternClass(this.ctx, patternConfig);
-        
-        // Initialize the new pattern
         newPattern.initialize();
-        
-        // Set as current pattern
+
+        if (this.useMultiLayer) {
+          // Multi-layer transition
+          this.switchPatternMultiLayer(patternName, newPattern, fullTransitionConfig);
+        } else {
+          // Single-layer transition with TransitionManager
+          this.transitionManager.startTransition(
+            this.currentPattern,
+            newPattern,
+            fullTransitionConfig
+          );
+        }
+
+        // Register pattern with synchronizer
+        this.synchronizer.registerPattern(patternName, newPattern);
+
+        // Update current pattern reference
+        const oldPattern = this.currentPattern;
         this.currentPattern = newPattern;
-        
-        // Update transition state
-        this.transitionState = {
-          type: 'transitioning',
-          effect: transitionType,
-          progress: 0,
-          toPattern: patternName
-        };
-        
+
+        // Clean up old pattern after transition
+        setTimeout(() => {
+          if (oldPattern) {
+            oldPattern.cleanup();
+          }
+        }, fullTransitionConfig.duration);
+
         if (this.config.enableDebug) {
-          console.log(`Switched to pattern: ${patternName}`);
+          console.log(`Switched to pattern: ${patternName} with transition: ${fullTransitionConfig.type}`);
         }
         
         resolve();
@@ -225,22 +266,37 @@ export class ASCIIPatternEngine {
     }
     
     this.lastFrameTime = performance.now();
+    this.synchronizer.start();
     
     const animate = (currentTime: number) => {
       const deltaTime = currentTime - this.lastFrameTime;
       this.lastFrameTime = currentTime;
       
-      // Clear canvas
-      this.clearCanvas();
+      // Update synchronizer
+      this.synchronizer.update(deltaTime);
       
-      // Update and render current pattern
-      if (this.currentPattern) {
-        this.currentPattern.update(deltaTime);
-        this.currentPattern.render();
+      if (this.useMultiLayer) {
+        // Multi-layer rendering
+        this.layerManager.updateLayers(deltaTime);
+        this.layerManager.renderLayers();
+      } else {
+        // Single-layer rendering with transitions
+        if (this.transitionManager.isTransitioning()) {
+          // Handle transition rendering
+          const transitionComplete = this.transitionManager.updateTransition(deltaTime, this.currentPattern!);
+          if (transitionComplete) {
+            this.transitionState.type = 'idle';
+          }
+        } else {
+          // Normal rendering
+          this.clearCanvas();
+          
+          if (this.currentPattern) {
+            this.currentPattern.update(deltaTime);
+            this.currentPattern.render();
+          }
+        }
       }
-      
-      // Handle transitions
-      this.updateTransition(deltaTime);
       
       // Continue animation loop
       this.animationId = requestAnimationFrame(animate);
@@ -260,6 +316,7 @@ export class ASCIIPatternEngine {
     if (this.animationId !== null) {
       cancelAnimationFrame(this.animationId);
       this.animationId = null;
+      this.synchronizer.stop();
       
       if (this.config.enableDebug) {
         console.log('Animation stopped');
@@ -276,17 +333,51 @@ export class ASCIIPatternEngine {
   }
   
   /**
-   * Update transition state
+   * Switch pattern using multi-layer system
    */
-  private updateTransition(deltaTime: number): void {
-    if (this.transitionState.type === 'transitioning') {
-      // Simple transition logic - can be expanded for different effects
-      this.transitionState.progress += deltaTime / 1000; // Convert to seconds
-      
-      if (this.transitionState.progress >= 1) {
-        this.transitionState = { type: 'idle', effect: '', progress: 0 };
-      }
+  private switchPatternMultiLayer(
+    patternName: string, 
+    newPattern: Pattern, 
+    transitionConfig: TransitionConfig
+  ): void {
+    // Assign new pattern to appropriate layer
+    const targetLayer = this.determineTargetLayer(patternName);
+    this.layerManager.assignPatternToLayer(targetLayer, newPattern);
+    
+    // Animate layer transition
+    this.animateLayerTransition(targetLayer, transitionConfig);
+  }
+
+  /**
+   * Determine which layer a pattern should be assigned to
+   */
+  private determineTargetLayer(patternName: string): string {
+    // Background patterns
+    if (['mandelbrot-ascii', 'binary-waves'].includes(patternName)) {
+      return 'background';
     }
+    
+    // Foreground patterns
+    if (['terminal-cursor', 'code-flow'].includes(patternName)) {
+      return 'foreground';
+    }
+    
+    // Default to middle layer
+    return 'middle';
+  }
+
+  /**
+   * Animate layer transition
+   */
+  private animateLayerTransition(layerName: string, config: TransitionConfig): void {
+    const layer = this.layerManager.getLayer(layerName);
+    if (!layer) return;
+
+    // Start with transparent layer
+    this.layerManager.updateLayer(layerName, { opacity: 0 });
+    
+    // Animate to full opacity
+    this.layerManager.animateLayer(layerName, 'opacity', 1, config.duration);
   }
   
   /**
@@ -341,6 +432,103 @@ export class ASCIIPatternEngine {
     this.registerPattern('matrix-rain', MatrixRain);
     this.registerPattern('binary-waves', BinaryWaves);
     this.registerPattern('geometric-flow', GeometricFlow);
+    this.registerPattern('terminal-cursor', TerminalCursor);
+    this.registerPattern('code-flow', CodeFlow);
+    this.registerPattern('mandelbrot-ascii', MandelbrotASCII);
+    this.registerPattern('conway-life', ConwayLife);
+    this.registerPattern('network-nodes', NetworkNodes);
+  }
+
+  /**
+   * Enable or disable multi-layer rendering
+   */
+  public setMultiLayerMode(enabled: boolean): void {
+    this.useMultiLayer = enabled;
+    
+    if (enabled && this.currentPattern) {
+      // Move current pattern to appropriate layer
+      const layerName = this.determineTargetLayer(this.currentPattern.name);
+      this.layerManager.assignPatternToLayer(layerName, this.currentPattern);
+    }
+  }
+
+  /**
+   * Get layer manager for direct access
+   */
+  public getLayerManager(): LayerManager {
+    return this.layerManager;
+  }
+
+  /**
+   * Get synchronizer for direct access
+   */
+  public getSynchronizer(): PatternSynchronizer {
+    return this.synchronizer;
+  }
+
+  /**
+   * Get transition manager for direct access
+   */
+  public getTransitionManager(): TransitionManager {
+    return this.transitionManager;
+  }
+
+  /**
+   * Set synchronization tempo
+   */
+  public setSyncTempo(tempo: number): void {
+    this.synchronizer.setTempo(tempo);
+  }
+
+  /**
+   * Add multiple patterns to different layers
+   */
+  public addPatternToLayer(
+    layerName: string, 
+    patternName: string, 
+    patternConfig: PatternConfig = {} as PatternConfig
+  ): void {
+    const PatternClass = this.patterns.get(patternName);
+    if (!PatternClass) {
+      throw new Error(`Pattern not found: ${patternName}`);
+    }
+
+    // Get or create layer
+    let layer = this.layerManager.getLayer(layerName);
+    if (!layer) {
+      layer = this.layerManager.createLayer(layerName, 0);
+    }
+
+    // Create pattern instance with layer context
+    const pattern = new PatternClass(layer.ctx!, patternConfig);
+    pattern.initialize();
+
+    // Assign to layer
+    this.layerManager.assignPatternToLayer(layerName, pattern);
+    
+    // Register with synchronizer
+    this.synchronizer.registerPattern(`${layerName}-${patternName}`, pattern);
+  }
+
+  /**
+   * Apply effect to specific layer
+   */
+  public applyLayerEffect(layerName: string, effect: string, intensity: number = 1): void {
+    this.layerManager.applyLayerEffect(layerName, effect, intensity);
+  }
+
+  /**
+   * Get current transition state
+   */
+  public getTransitionState(): TransitionState {
+    return this.transitionManager.getTransitionState();
+  }
+
+  /**
+   * Force complete current transition
+   */
+  public forceCompleteTransition(): void {
+    this.transitionManager.forceComplete();
   }
 
   /**
@@ -353,6 +541,10 @@ export class ASCIIPatternEngine {
       this.currentPattern.cleanup();
       this.currentPattern = null;
     }
+    
+    // Clean up managers
+    this.layerManager.cleanup();
+    this.synchronizer.cleanup();
     
     this.patterns.clear();
     
