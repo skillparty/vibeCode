@@ -82,7 +82,7 @@
   - Write integration tests for main app component
   - _Requirements: 1.1, 2.7, 5.7_
 
-- [ ] 10. Implement inactivity detection and screensaver activation
+- [x] 10. Implement inactivity detection and screensaver activation
 
   - Create useInactivityDetector custom hook with 3-minute timeout
   - Add event listeners for mouse movement, keyboard input, and user activity
@@ -92,7 +92,7 @@
   - Write unit tests for inactivity detection logic
   - _Requirements: 4.1, 4.2, 5.4_
 
-- [ ] 11. Add Fullscreen API integration and Page Visibility handling
+- [x] 11. Add Fullscreen API integration and Page Visibility handling
 
   - Implement fullscreen mode toggle using Fullscreen API
   - Add Page Visibility API integration to pause animations when tab not visible
