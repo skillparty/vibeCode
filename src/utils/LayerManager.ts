@@ -5,6 +5,7 @@ export class LayerManager {
   private ctx: CanvasRenderingContext2D;
   private layers: Map<string, RenderLayer> = new Map();
   private sortedLayers: RenderLayer[] = [];
+  private effectsEnabled: boolean = true;
 
   constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
     this.canvas = canvas;
@@ -214,7 +215,7 @@ export class LayerManager {
    */
   public applyLayerEffect(layerName: string, effect: string, intensity: number = 1): void {
     const layer = this.layers.get(layerName);
-    if (!layer || !layer.ctx) return;
+    if (!layer || !layer.ctx || !this.effectsEnabled) return;
 
     switch (effect) {
       case 'blur':
@@ -234,6 +235,27 @@ export class LayerManager {
         layer.ctx.filter = 'none';
         layer.ctx.shadowBlur = 0;
     }
+  }
+  
+  /**
+   * Enable or disable effects for performance optimization
+   */
+  public setEffectsEnabled(enabled: boolean): void {
+    this.effectsEnabled = enabled;
+    
+    if (!enabled) {
+      // Clear all effects when disabled
+      this.layers.forEach((layer, name) => {
+        this.clearLayerEffect(name);
+      });
+    }
+  }
+  
+  /**
+   * Check if effects are enabled
+   */
+  public areEffectsEnabled(): boolean {
+    return this.effectsEnabled;
   }
 
   /**

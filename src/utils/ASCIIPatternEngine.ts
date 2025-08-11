@@ -10,6 +10,8 @@ import { NetworkNodes } from './NetworkNodes';
 import { TransitionManager } from './TransitionManager';
 import { LayerManager } from './LayerManager';
 import { PatternSynchronizer } from './PatternSynchronizer';
+import { PerformanceMonitor, PerformanceMetrics } from './PerformanceMonitor';
+import { PatternLoader } from './PatternLoader';
 
 export interface EngineConfig {
   fontSize: number;
@@ -17,6 +19,9 @@ export interface EngineConfig {
   backgroundColor: string;
   foregroundColor: string;
   enableDebug: boolean;
+  enablePerformanceMonitoring: boolean;
+  targetFps: number;
+  enableAutoOptimization: boolean;
 }
 
 export class ASCIIPatternEngine {
@@ -28,6 +33,15 @@ export class ASCIIPatternEngine {
   private animationId: number | null = null;
   private lastFrameTime: number = 0;
   private config: EngineConfig;
+  
+  // Performance monitoring
+  private performanceMonitor: PerformanceMonitor;
+  private frameTimeAccumulator: number = 0;
+  private frameTimeTarget: number = 16.67; // 60fps target
+  private isPerformanceOptimized: boolean = false;
+  
+  // Lazy loading
+  private patternLoader: PatternLoader;
   
   // New managers for advanced features
   private transitionManager: TransitionManager;
@@ -58,8 +72,23 @@ export class ASCIIPatternEngine {
       backgroundColor: '#000000',
       foregroundColor: '#00ff00',
       enableDebug: false,
+      enablePerformanceMonitoring: true,
+      targetFps: 60,
+      enableAutoOptimization: true,
       ...config
     };
+    
+    // Initialize performance monitoring
+    this.performanceMonitor = new PerformanceMonitor({
+      targetFps: this.config.targetFps,
+      enableAutoOptimization: this.config.enableAutoOptimization
+    });
+    
+    // Initialize lazy loading
+    this.patternLoader = new PatternLoader();
+    
+    // Set up performance monitoring callbacks
+    this.setupPerformanceCallbacks();
     
     // Initialize managers
     this.transitionManager = new TransitionManager(canvas, ctx);
@@ -194,71 +223,65 @@ export class ASCIIPatternEngine {
   }
   
   /**
-   * Switch to a different pattern with advanced transition
+   * Switch to a different pattern with advanced transition and lazy loading
    */
-  public switchPattern(
+  public async switchPattern(
     patternName: string, 
     transitionConfig: Partial<TransitionConfig> = {}, 
     patternConfig: PatternConfig = {} as PatternConfig
   ): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const PatternClass = this.patterns.get(patternName);
-      if (!PatternClass) {
-        reject(new Error(`Pattern not found: ${patternName}`));
-        return;
-      }
+    try {
+      // Load pattern lazily
+      const PatternClass = await this.patternLoader.loadPattern(patternName);
       
-      try {
-        const fullTransitionConfig: TransitionConfig = {
-          type: 'fade',
-          duration: 1000,
-          easing: 'ease-in-out',
-          ...transitionConfig
-        };
+      const fullTransitionConfig: TransitionConfig = {
+        type: 'fade',
+        duration: 1000,
+        easing: 'ease-in-out',
+        ...transitionConfig
+      };
 
-        // Create new pattern instance
-        const newPattern = new PatternClass(this.ctx, patternConfig);
-        newPattern.initialize();
+      // Create new pattern instance
+      const newPattern = new PatternClass(this.ctx, patternConfig);
+      newPattern.initialize();
 
-        if (this.useMultiLayer) {
-          // Multi-layer transition
-          this.switchPatternMultiLayer(patternName, newPattern, fullTransitionConfig);
-        } else {
-          // Single-layer transition with TransitionManager
-          this.transitionManager.startTransition(
-            this.currentPattern,
-            newPattern,
-            fullTransitionConfig
-          );
-        }
-
-        // Register pattern with synchronizer
-        this.synchronizer.registerPattern(patternName, newPattern);
-
-        // Update current pattern reference
-        const oldPattern = this.currentPattern;
-        this.currentPattern = newPattern;
-
-        // Clean up old pattern after transition
-        setTimeout(() => {
-          if (oldPattern) {
-            oldPattern.cleanup();
-          }
-        }, fullTransitionConfig.duration);
-
-        if (this.config.enableDebug) {
-          console.log(`Switched to pattern: ${patternName} with transition: ${fullTransitionConfig.type}`);
-        }
-        
-        resolve();
-      } catch (error) {
-        reject(error);
+      if (this.useMultiLayer) {
+        // Multi-layer transition
+        this.switchPatternMultiLayer(patternName, newPattern, fullTransitionConfig);
+      } else {
+        // Single-layer transition with TransitionManager
+        this.transitionManager.startTransition(
+          this.currentPattern,
+          newPattern,
+          fullTransitionConfig
+        );
       }
-    });
+
+      // Register pattern with synchronizer
+      this.synchronizer.registerPattern(patternName, newPattern);
+
+      // Update current pattern reference
+      const oldPattern = this.currentPattern;
+      this.currentPattern = newPattern;
+
+      // Clean up old pattern after transition
+      setTimeout(() => {
+        if (oldPattern) {
+          oldPattern.cleanup();
+        }
+      }, fullTransitionConfig.duration);
+
+      if (this.config.enableDebug) {
+        console.log(`Switched to pattern: ${patternName} with transition: ${fullTransitionConfig.type}`);
+      }
+    } catch (error) {
+      console.error(`Failed to switch to pattern: ${patternName}`, error);
+      throw error;
+    }
   }
   
   /**
-   * Start the animation loop
+   * Start the animation loop with performance optimization
    */
   public startAnimation(): void {
     if (this.animationId !== null) {
@@ -266,33 +289,60 @@ export class ASCIIPatternEngine {
     }
     
     this.lastFrameTime = performance.now();
+    this.frameTimeAccumulator = 0;
     this.synchronizer.start();
     
+    // Start performance monitoring
+    if (this.config.enablePerformanceMonitoring) {
+      this.performanceMonitor.start();
+    }
+    
     const animate = (currentTime: number) => {
+      // Calculate delta time with high precision
       const deltaTime = currentTime - this.lastFrameTime;
       this.lastFrameTime = currentTime;
       
+      // Update performance monitoring
+      if (this.config.enablePerformanceMonitoring) {
+        this.performanceMonitor.update(currentTime);
+      }
+      
+      // Frame rate limiting for performance optimization
+      this.frameTimeAccumulator += deltaTime;
+      
+      // Skip frame if we're running too fast (unless performance is degraded)
+      if (!this.isPerformanceOptimized && this.frameTimeAccumulator < this.frameTimeTarget) {
+        this.animationId = requestAnimationFrame(animate);
+        return;
+      }
+      
+      // Reset accumulator
+      this.frameTimeAccumulator = 0;
+      
+      // Apply performance-based delta time scaling
+      const scaledDeltaTime = this.getScaledDeltaTime(deltaTime);
+      
       // Update synchronizer
-      this.synchronizer.update(deltaTime);
+      this.synchronizer.update(scaledDeltaTime);
       
       if (this.useMultiLayer) {
-        // Multi-layer rendering
-        this.layerManager.updateLayers(deltaTime);
+        // Multi-layer rendering with performance optimization
+        this.layerManager.updateLayers(scaledDeltaTime);
         this.layerManager.renderLayers();
       } else {
         // Single-layer rendering with transitions
         if (this.transitionManager.isTransitioning()) {
           // Handle transition rendering
-          const transitionComplete = this.transitionManager.updateTransition(deltaTime, this.currentPattern!);
+          const transitionComplete = this.transitionManager.updateTransition(scaledDeltaTime, this.currentPattern!);
           if (transitionComplete) {
             this.transitionState.type = 'idle';
           }
         } else {
-          // Normal rendering
+          // Normal rendering with performance checks
           this.clearCanvas();
           
           if (this.currentPattern) {
-            this.currentPattern.update(deltaTime);
+            this.currentPattern.update(scaledDeltaTime);
             this.currentPattern.render();
           }
         }
@@ -305,7 +355,7 @@ export class ASCIIPatternEngine {
     this.animationId = requestAnimationFrame(animate);
     
     if (this.config.enableDebug) {
-      console.log('Animation started');
+      console.log('Animation started with performance monitoring');
     }
   }
   
@@ -317,6 +367,11 @@ export class ASCIIPatternEngine {
       cancelAnimationFrame(this.animationId);
       this.animationId = null;
       this.synchronizer.stop();
+      
+      // Stop performance monitoring
+      if (this.config.enablePerformanceMonitoring) {
+        this.performanceMonitor.stop();
+      }
       
       if (this.config.enableDebug) {
         console.log('Animation stopped');
@@ -426,17 +481,14 @@ export class ASCIIPatternEngine {
   }
   
   /**
-   * Register built-in patterns
+   * Register built-in patterns (now handled by PatternLoader)
    */
   private registerBuiltInPatterns(): void {
-    this.registerPattern('matrix-rain', MatrixRain);
-    this.registerPattern('binary-waves', BinaryWaves);
-    this.registerPattern('geometric-flow', GeometricFlow);
-    this.registerPattern('terminal-cursor', TerminalCursor);
-    this.registerPattern('code-flow', CodeFlow);
-    this.registerPattern('mandelbrot-ascii', MandelbrotASCII);
-    this.registerPattern('conway-life', ConwayLife);
-    this.registerPattern('network-nodes', NetworkNodes);
+    // Patterns are now loaded lazily via PatternLoader
+    // Start preloading essential patterns in background
+    this.patternLoader.preloadEssentialPatterns().catch(error => {
+      console.warn('Failed to preload essential patterns:', error);
+    });
   }
 
   /**
@@ -481,33 +533,36 @@ export class ASCIIPatternEngine {
   }
 
   /**
-   * Add multiple patterns to different layers
+   * Add multiple patterns to different layers with lazy loading
    */
-  public addPatternToLayer(
+  public async addPatternToLayer(
     layerName: string, 
     patternName: string, 
     patternConfig: PatternConfig = {} as PatternConfig
-  ): void {
-    const PatternClass = this.patterns.get(patternName);
-    if (!PatternClass) {
-      throw new Error(`Pattern not found: ${patternName}`);
+  ): Promise<void> {
+    try {
+      // Load pattern lazily
+      const PatternClass = await this.patternLoader.loadPattern(patternName);
+
+      // Get or create layer
+      let layer = this.layerManager.getLayer(layerName);
+      if (!layer) {
+        layer = this.layerManager.createLayer(layerName, 0);
+      }
+
+      // Create pattern instance with layer context
+      const pattern = new PatternClass(layer.ctx!, patternConfig);
+      pattern.initialize();
+
+      // Assign to layer
+      this.layerManager.assignPatternToLayer(layerName, pattern);
+      
+      // Register with synchronizer
+      this.synchronizer.registerPattern(`${layerName}-${patternName}`, pattern);
+    } catch (error) {
+      console.error(`Failed to add pattern to layer: ${patternName}`, error);
+      throw error;
     }
-
-    // Get or create layer
-    let layer = this.layerManager.getLayer(layerName);
-    if (!layer) {
-      layer = this.layerManager.createLayer(layerName, 0);
-    }
-
-    // Create pattern instance with layer context
-    const pattern = new PatternClass(layer.ctx!, patternConfig);
-    pattern.initialize();
-
-    // Assign to layer
-    this.layerManager.assignPatternToLayer(layerName, pattern);
-    
-    // Register with synchronizer
-    this.synchronizer.registerPattern(`${layerName}-${patternName}`, pattern);
   }
 
   /**
@@ -532,6 +587,142 @@ export class ASCIIPatternEngine {
   }
 
   /**
+   * Set up performance monitoring callbacks
+   */
+  private setupPerformanceCallbacks(): void {
+    this.performanceMonitor.addCallback((metrics: PerformanceMetrics) => {
+      // Handle performance degradation
+      if (metrics.isPerformanceDegraded) {
+        this.applyPerformanceOptimizations(metrics.degradationLevel);
+      } else if (this.isPerformanceOptimized) {
+        this.restorePerformanceSettings();
+      }
+      
+      // Log performance warnings
+      if (this.config.enableDebug) {
+        if (metrics.fps < 45) {
+          console.warn(`Low FPS detected: ${metrics.fps.toFixed(1)}`);
+        }
+        if (metrics.memoryUsage > 40) {
+          console.warn(`High memory usage: ${metrics.memoryUsage.toFixed(1)}MB`);
+        }
+      }
+    });
+  }
+  
+  /**
+   * Apply performance optimizations based on degradation level
+   */
+  private applyPerformanceOptimizations(level: number): void {
+    if (this.isPerformanceOptimized) return;
+    
+    this.isPerformanceOptimized = true;
+    
+    switch (level) {
+      case 1:
+        // Level 1: Reduce update frequency
+        this.frameTimeTarget = 20; // 50fps
+        break;
+      case 2:
+        // Level 2: Further reduce frequency and disable effects
+        this.frameTimeTarget = 25; // 40fps
+        this.layerManager.setEffectsEnabled(false);
+        break;
+      case 3:
+        // Level 3: Minimal rendering
+        this.frameTimeTarget = 33.33; // 30fps
+        this.layerManager.setEffectsEnabled(false);
+        this.useMultiLayer = false;
+        break;
+    }
+    
+    if (this.config.enableDebug) {
+      console.log(`Performance optimization applied - Level ${level}`);
+    }
+  }
+  
+  /**
+   * Restore performance settings when FPS improves
+   */
+  private restorePerformanceSettings(): void {
+    if (!this.isPerformanceOptimized) return;
+    
+    this.isPerformanceOptimized = false;
+    this.frameTimeTarget = 16.67; // 60fps
+    this.layerManager.setEffectsEnabled(true);
+    
+    if (this.config.enableDebug) {
+      console.log('Performance settings restored');
+    }
+  }
+  
+  /**
+   * Get scaled delta time based on performance state
+   */
+  private getScaledDeltaTime(deltaTime: number): number {
+    if (!this.isPerformanceOptimized) {
+      return deltaTime;
+    }
+    
+    // Scale delta time to maintain consistent animation speed
+    // even when frame rate is reduced
+    const targetFrameTime = 16.67; // 60fps
+    const scaleFactor = this.frameTimeTarget / targetFrameTime;
+    return deltaTime * scaleFactor;
+  }
+  
+  /**
+   * Get performance metrics
+   */
+  public getPerformanceMetrics(): PerformanceMetrics {
+    return this.performanceMonitor.getMetrics();
+  }
+  
+  /**
+   * Get performance monitor instance
+   */
+  public getPerformanceMonitor(): PerformanceMonitor {
+    return this.performanceMonitor;
+  }
+  
+  /**
+   * Force performance degradation for testing
+   */
+  public forcePerformanceDegradation(level: number): void {
+    this.performanceMonitor.forceDegradation(level);
+  }
+  
+  /**
+   * Reset performance monitoring
+   */
+  public resetPerformanceMonitoring(): void {
+    this.performanceMonitor.reset();
+    this.isPerformanceOptimized = false;
+    this.frameTimeTarget = 16.67;
+  }
+  
+  /**
+   * Get pattern loader instance
+   */
+  public getPatternLoader(): PatternLoader {
+    return this.patternLoader;
+  }
+  
+  /**
+   * Preload patterns for better performance
+   */
+  public async preloadPatterns(patternNames: string[]): Promise<void> {
+    await this.patternLoader.preloadPatterns(patternNames);
+  }
+  
+  /**
+   * Check if pattern is loaded
+   */
+  public isPatternLoaded(patternName: string): boolean {
+    return this.patternLoader.isPatternLoaded(patternName);
+  }
+  
+  /**
    * Clean up resources
    */
   public cleanup(): void {
@@ -545,6 +736,14 @@ export class ASCIIPatternEngine {
     // Clean up managers
     this.layerManager.cleanup();
     this.synchronizer.cleanup();
+    
+    // Clean up performance monitoring
+    if (this.config.enablePerformanceMonitoring) {
+      this.performanceMonitor.stop();
+    }
+    
+    // Clean up pattern loader
+    this.patternLoader.cleanup();
     
     this.patterns.clear();
     

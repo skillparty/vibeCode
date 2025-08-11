@@ -1,0 +1,285 @@
+/* Accessibility styles for the ASCII Screensaver */
+
+/* Visually hidden utility class for screen readers */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Skip links for keyboard navigation */
+.skip-links {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+}
+
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: #000;
+  color: #fff;
+  padding: 8px;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  transition: top 0.3s;
+}
+
+.skip-link:focus {
+  top: 6px;
+}
+
+/* Focus indicators */
+.screensaver-app.keyboard-navigation *:focus {
+  outline: 2px solid #00ff00;
+  outline-offset: 2px;
+}
+
+.screensaver-app.keyboard-navigation button:focus,
+.screensaver-app.keyboard-navigation input:focus,
+.screensaver-app.keyboard-navigation select:focus {
+  outline: 2px solid #00ff00;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(0, 255, 0, 0.2);
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .screensaver-app {
+    --bg-color: #000000;
+    --text-color: #ffffff;
+    --accent-color: #ffff00;
+  }
+  
+  .quote-overlay {
+    background: rgba(0, 0, 0, 0.9) !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff;
+  }
+  
+  .configuration-panel {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .screensaver-app.reduced-motion *,
+  .screensaver-app.reduced-motion *::before,
+  .screensaver-app.reduced-motion *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .ascii-canvas {
+    animation: none !important;
+  }
+  
+  .quote-overlay {
+    transition: opacity 0.1s ease !important;
+  }
+}
+
+/* Force reduced motion when setting is enabled */
+.screensaver-app.reduced-motion *,
+.screensaver-app.reduced-motion *::before,
+.screensaver-app.reduced-motion *::after {
+  animation-duration: 0.1s !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.1s !important;
+}
+
+/* Keyboard help overlay */
+.keyboard-help {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.keyboard-help:focus {
+  opacity: 1;
+  pointer-events: auto;
+  background: rgba(0, 0, 0, 0.9);
+  color: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  max-width: 300px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Settings button accessibility */
+.settings-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.settings-button:hover,
+.settings-button:focus {
+  background: rgba(0, 0, 0, 0.9);
+  border-color: #00ff00;
+  transform: scale(1.1);
+}
+
+.settings-button:focus {
+  outline: 2px solid #00ff00;
+  outline-offset: 2px;
+}
+
+/* Status information for screen readers */
+.status-info {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+}
+
+/* Debug info accessibility */
+.debug-info {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.8);
+  color: #00ff00;
+  font-family: monospace;
+  font-size: 12px;
+  padding: 10px;
+  border-radius: 4px;
+  max-width: 300px;
+  max-height: 200px;
+  overflow: auto;
+}
+
+.debug-info summary {
+  cursor: pointer;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.debug-info pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* ARIA live regions */
+[aria-live] {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Focus trap styles */
+.focus-trap-active {
+  position: relative;
+}
+
+.focus-trap-active::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  pointer-events: none;
+}
+
+/* Responsive accessibility */
+@media (max-width: 768px) {
+  .skip-link {
+    font-size: 16px;
+    padding: 12px;
+  }
+  
+  .settings-button {
+    width: 56px;
+    height: 56px;
+    font-size: 24px;
+  }
+  
+  .keyboard-help:focus {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow: auto;
+  }
+}
+
+/* Print styles for accessibility */
+@media print {
+  .screensaver-app {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .ascii-canvas,
+  .settings-button,
+  .debug-info,
+  .skip-links {
+    display: none !important;
+  }
+  
+  .quote-overlay {
+    position: static !important;
+    background: transparent !important;
+    color: black !important;
+    font-size: 18px !important;
+  }
+}
+
+/* Color scheme support */
+@media (prefers-color-scheme: dark) {
+  .screensaver-app {
+    --bg-color: #000000;
+    --text-color: #ffffff;
+    --accent-color: #00ff00;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .screensaver-app:not(.theme-matrix):not(.theme-terminal):not(.theme-retro):not(.theme-blue) {
+    --bg-color: #ffffff;
+    --text-color: #000000;
+    --accent-color: #0066cc;
+  }
+}
