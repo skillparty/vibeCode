@@ -102,7 +102,7 @@
   - Write integration tests for fullscreen and visibility API usage
   - _Requirements: 4.3, 4.4_
 
-- [ ] 12. Create configuration panel and user controls
+- [x] 12. Create configuration panel and user controls
 
   - Implement ConfigurationPanel component with theme selection, speed controls, and effect toggles
   - Add NavigationControls component with manual quote navigation (arrow keys)
@@ -112,7 +112,7 @@
   - Write component tests for configuration and navigation controls
   - _Requirements: 3.1, 3.2, 3.3, 3.5, 3.7_
 
-- [ ] 13. Implement localStorage persistence and configuration management
+- [x] 13. Implement localStorage persistence and configuration management
 
   - Create useConfigPersistence custom hook for saving/loading user preferences
   - Add configuration validation and default value handling
