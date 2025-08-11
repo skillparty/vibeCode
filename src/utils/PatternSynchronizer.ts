@@ -115,7 +115,7 @@ export class PatternSynchronizer {
    * Update patterns with synchronized timing
    */
   private updateSynchronizedPatterns(deltaTime: number): void {
-    for (const [name, { pattern, config }] of this.patterns) {
+    this.patterns.forEach(({ pattern, config }, name) => {
       let adjustedDelta = deltaTime;
 
       switch (config.syncMode) {
@@ -138,7 +138,7 @@ export class PatternSynchronizer {
       
       // Update pattern with synchronized delta
       pattern.update(phaseAdjustedDelta);
-    }
+    });
   }
 
   /**
@@ -259,9 +259,9 @@ export class PatternSynchronizer {
     this.tempo = Math.max(60, Math.min(200, tempo)); // Clamp between 60-200 BPM
     
     // Update all pattern configs
-    for (const { config } of this.patterns.values()) {
+    this.patterns.forEach(({ config }) => {
       config.masterTempo = this.tempo;
-    }
+    });
   }
 
   /**

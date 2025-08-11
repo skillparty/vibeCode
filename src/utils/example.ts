@@ -37,7 +37,7 @@ export async function startExampleAnimation(engine: ASCIIPatternEngine): Promise
   };
   
   // Switch to test pattern
-  await engine.switchPattern('test', 'fade', patternConfig);
+  await engine.switchPattern('test', { type: 'fade', duration: 1000 }, patternConfig);
   
   // Start animation
   engine.startAnimation();
@@ -60,7 +60,7 @@ export async function demonstratePatternSwitching(engine: ASCIIPatternEngine): P
       density: 'medium'
     };
     
-    await engine.switchPattern(patternName, 'fade', config);
+    await engine.switchPattern(patternName, { type: 'fade', duration: 1000 }, config);
     currentIndex = (currentIndex + 1) % patterns.length;
   };
   
@@ -81,4 +81,5 @@ export function cleanupExample(engine: ASCIIPatternEngine): void {
 
 // Export types for external use
 export type { EngineConfig } from './ASCIIPatternEngine';
-export { ASCIIPatternEngine, BasePattern, TestPattern };
+export { ASCIIPatternEngine } from './ASCIIPatternEngine';
+export { BasePattern, TestPattern } from './BasePattern';

@@ -119,7 +119,7 @@ export class LayerManager {
    * Update sorted layers array based on zIndex
    */
   private updateSortedLayers(): void {
-    this.sortedLayers = Array.from(this.layers.values())
+    this.sortedLayers = Array.from(this.layers).map(([, layer]) => layer)
       .sort((a, b) => a.zIndex - b.zIndex);
   }
 
@@ -196,7 +196,7 @@ export class LayerManager {
    * Resize all layer canvases
    */
   public resize(width: number, height: number): void {
-    for (const layer of this.layers.values()) {
+    this.layers.forEach((layer) => {
       if (layer.canvas && layer.ctx) {
         layer.canvas.width = width;
         layer.canvas.height = height;
@@ -206,7 +206,7 @@ export class LayerManager {
         layer.ctx.textBaseline = this.ctx.textBaseline;
         layer.ctx.textAlign = this.ctx.textAlign;
       }
-    }
+    });
   }
 
   /**
@@ -297,11 +297,11 @@ export class LayerManager {
    * Clean up all layers
    */
   public cleanup(): void {
-    for (const layer of this.layers.values()) {
+    this.layers.forEach((layer) => {
       if (layer.pattern) {
         layer.pattern.cleanup();
       }
-    }
+    });
     
     this.layers.clear();
     this.sortedLayers = [];

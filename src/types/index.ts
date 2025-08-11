@@ -47,6 +47,8 @@ export interface PatternConfig {
   rotationSpeed?: 'slow' | 'medium' | 'fast';
   complexity?: 'low' | 'medium' | 'high';
   currentTheme?: 'matrix' | 'terminal' | 'retro' | 'blue';
+  fontSize?: number;
+  fontFamily?: string;
 }
 
 export interface ScreensaverState {

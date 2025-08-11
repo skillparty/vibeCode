@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote Overlay Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', Monaco, Consolas, monospace;
+            background: #000;
+            color: #00ff00;
+            overflow: hidden;
+        }
+        
+        .test-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 255, 0, 0.03) 2px,
+                    rgba(0, 255, 0, 0.03) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 255, 0, 0.03) 2px,
+                    rgba(0, 255, 0, 0.03) 4px
+                );
+        }
+        
+        .quote-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            pointer-events: none;
+            opacity: 1;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        .quote-container {
+            max-width: 85%;
+            width: fit-content;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 2.5rem 3rem;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(0, 255, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .quote-text {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            color: #00ff00;
+            font-weight: 400;
+            text-shadow: 
+                0 0 10px rgba(0, 255, 0, 0.4),
+                0 2px 4px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .quote-author {
+            font-size: 1rem;
+            color: #00cc00;
+            font-style: italic;
+            font-weight: 300;
+            text-shadow: 
+                0 0 8px rgba(0, 204, 0, 0.3),
+                0 1px 2px rgba(0, 0, 0, 0.5);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .quote-metadata {
+            font-size: 0.75rem;
+            color: #008800;
+            opacity: 0.8;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .control-button {
+            padding: 8px 16px;
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 12px;
+        }
+        
+        .control-button:hover {
+            background: rgba(0, 255, 0, 0.2);
+        }
+        
+        .fade-out {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        
+        .fade-in {
+            opacity: 1;
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="quote-overlay" id="quoteOverlay">
+            <div class="quote-container">
+                <blockquote class="quote-text" id="quoteText">
+                    "The best programs are written when the programmer is supposed to be working on something else."
+                </blockquote>
+                <footer>
+                    <cite class="quote-author" id="quoteAuthor">
+                        — Melinda Varian
+                    </cite>
+                    <div class="quote-metadata">
+                        <span id="quoteCategory">creativity</span>
+                        <span id="quotePattern">matrix</span>
+                        <span id="quoteDifficulty"></span>
+                    </div>
+                </footer>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="control-button" onclick="toggleVisibility()">Toggle Visibility</button>
+            <button class="control-button" onclick="nextQuote()">Next Quote</button>
+            <button class="control-button" onclick="prevQuote()">Previous Quote</button>
+            <button class="control-button" onclick="toggleTheme()">Change Theme</button>
+        </div>
+    </div>
+
+    <script>
+        const quotes = [
+            {
+                text: "The best programs are written when the programmer is supposed to be working on something else.",
+                author: "Melinda Varian",
+                category: "creativity",
+                pattern: "matrix",
+                difficulty: 1
+            },
+            {
+                text: "Code is like humor. When you have to explain it, it's bad.",
+                author: "Cory House",
+                category: "clarity",
+                pattern: "terminal",
+                difficulty: 1
+            },
+            {
+                text: "First, solve the problem. Then, write the code.",
+                author: "John Johnson",
+                category: "problem-solving",
+                pattern: "geometric",
+                difficulty: 1
+            },
+            {
+                text: "Programs must be written for people to read, and only incidentally for machines to execute.",
+                author: "Harold Abelson",
+                category: "readability",
+                pattern: "code-flow",
+                difficulty: 2
+            },
+            {
+                text: "Any fool can write code that a computer can understand. Good programmers write code that humans can understand.",
+                author: "Martin Fowler",
+                category: "readability",
+                pattern: "matrix",
+                difficulty: 2
+            }
+        ];
+        
+        let currentQuoteIndex = 0;
+        let isVisible = true;
+        let currentTheme = 'matrix';
+        
+        const themes = {
+            matrix: {
+                background: 'rgba(0, 0, 0, 0.8)',
+                border: 'rgba(0, 255, 0, 0.3)',
+                textColor: '#00ff00',
+                authorColor: '#00cc00',
+                metaColor: '#008800'
+            },
+            terminal: {
+                background: 'rgba(0, 20, 0, 0.85)',
+                border: 'rgba(0, 255, 0, 0.4)',
+                textColor: '#00ff00',
+                authorColor: '#00dd00',
+                metaColor: '#00aa00'
+            },
+            retro: {
+                background: 'rgba(20, 0, 0, 0.8)',
+                border: 'rgba(255, 107, 53, 0.3)',
+                textColor: '#ff6b35',
+                authorColor: '#f7931e',
+                metaColor: '#ffcc02'
+            },
+            blue: {
+                background: 'rgba(0, 0, 20, 0.8)',
+                border: 'rgba(0, 191, 255, 0.3)',
+                textColor: '#00bfff',
+                authorColor: '#0099cc',
+                metaColor: '#0077aa'
+            }
+        };
+        
+        function updateQuote() {
+            const quote = quotes[currentQuoteIndex];
+            const overlay = document.getElementById('quoteOverlay');
+            
+            // Fade out
+            overlay.classList.add('fade-out');
+            
+            setTimeout(() => {
+                document.getElementById('quoteText').textContent = `"${quote.text}"`;
+                document.getElementById('quoteAuthor').textContent = `— ${quote.author}`;
+                document.getElementById('quoteCategory').textContent = quote.category;
+                document.getElementById('quotePattern').textContent = quote.pattern;
+                document.getElementById('quoteDifficulty').textContent = quote.difficulty > 1 ? '★'.repeat(quote.difficulty) : '';
+                
+                // Fade in
+                overlay.classList.remove('fade-out');
+                overlay.classList.add('fade-in');
+                
+                setTimeout(() => {
+                    overlay.classList.remove('fade-in');
+                }, 300);
+            }, 300);
+        }
+        
+        function applyTheme() {
+            const theme = themes[currentTheme];
+            const container = document.querySelector('.quote-container');
+            const text = document.querySelector('.quote-text');
+            const author = document.querySelector('.quote-author');
+            const metadata = document.querySelector('.quote-metadata');
+            
+            container.style.background = theme.background;
+            container.style.borderColor = theme.border;
+            text.style.color = theme.textColor;
+            author.style.color = theme.authorColor;
+            metadata.style.color = theme.metaColor;
+        }
+        
+        function toggleVisibility() {
+            const overlay = document.getElementById('quoteOverlay');
+            isVisible = !isVisible;
+            overlay.style.opacity = isVisible ? '1' : '0';
+        }
+        
+        function nextQuote() {
+            currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
+            updateQuote();
+        }
+        
+        function prevQuote() {
+            currentQuoteIndex = (currentQuoteIndex - 1 + quotes.length) % quotes.length;
+            updateQuote();
+        }
+        
+        function toggleTheme() {
+            const themeNames = Object.keys(themes);
+            const currentIndex = themeNames.indexOf(currentTheme);
+            currentTheme = themeNames[(currentIndex + 1) % themeNames.length];
+            applyTheme();
+        }
+        
+        // Initialize
+        applyTheme();
+        
+        // Auto-advance quotes every 5 seconds
+        setInterval(nextQuote, 5000);
+    </script>
+</body>
+</html>

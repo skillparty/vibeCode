@@ -62,7 +62,7 @@ describe('MatrixRain Integration with ASCIIPatternEngine', () => {
   test('should register MatrixRain pattern automatically', () => {
     // The engine should automatically register the matrix-rain pattern
     expect(() => {
-      engine.switchPattern('matrix-rain', 'fade', {
+      engine.switchPattern('matrix-rain', { type: 'fade', duration: 1000 }, {
         characters: '01{}[]()<>/*+-=;:.,!@#$%^&*',
         speed: 'medium',
         density: 'medium'
@@ -78,7 +78,7 @@ describe('MatrixRain Integration with ASCIIPatternEngine', () => {
       glitchProbability: 0.02
     };
     
-    await engine.switchPattern('matrix-rain', 'fade', patternConfig);
+    await engine.switchPattern('matrix-rain', { type: 'fade', duration: 1000 }, patternConfig);
     
     const currentPattern = engine.getCurrentPattern();
     expect(currentPattern).toBeInstanceOf(MatrixRain);
@@ -93,7 +93,7 @@ describe('MatrixRain Integration with ASCIIPatternEngine', () => {
       glitchProbability: 0.05
     };
     
-    await engine.switchPattern('matrix-rain', 'fade', patternConfig);
+    await engine.switchPattern('matrix-rain', { type: 'fade', duration: 1000 }, patternConfig);
     
     // Start animation
     engine.startAnimation();
@@ -111,7 +111,7 @@ describe('MatrixRain Integration with ASCIIPatternEngine', () => {
   });
   
   test('should handle pattern configuration changes', async () => {
-    await engine.switchPattern('matrix-rain', 'fade', {
+    await engine.switchPattern('matrix-rain', { type: 'fade', duration: 1000 }, {
       characters: '01',
       speed: 'slow' as const,
       density: 'low' as const
@@ -134,7 +134,7 @@ describe('MatrixRain Integration with ASCIIPatternEngine', () => {
   });
   
   test('should handle resize events properly', async () => {
-    await engine.switchPattern('matrix-rain', 'fade', {
+    await engine.switchPattern('matrix-rain', { type: 'fade', duration: 1000 }, {
       characters: '01{}[]()<>/*+-=;:.,!@#$%^&*',
       speed: 'medium' as const,
       density: 'medium' as const
@@ -154,7 +154,7 @@ describe('MatrixRain Integration with ASCIIPatternEngine', () => {
   });
   
   test('should clean up MatrixRain pattern properly', async () => {
-    await engine.switchPattern('matrix-rain', 'fade', {
+    await engine.switchPattern('matrix-rain', { type: 'fade', duration: 1000 }, {
       characters: '01{}[]()<>/*+-=;:.,!@#$%^&*',
       speed: 'medium' as const,
       density: 'medium' as const
@@ -171,7 +171,7 @@ describe('MatrixRain Integration with ASCIIPatternEngine', () => {
       }
     });
     
-    await engine.switchPattern('test', 'fade', {
+    await engine.switchPattern('test', { type: 'fade', duration: 1000 }, {
       characters: 'TEST',
       speed: 'medium' as const,
       density: 'medium' as const

@@ -87,7 +87,7 @@ export const ASCIICanvas: React.FC<ASCIICanvasProps> = ({
         };
         
         // Switch to test pattern
-        await engine.switchPattern('test', 'fade', patternConfig);
+        await engine.switchPattern('test', { type: 'fade', duration: 1000 }, patternConfig);
         
         // Start animation
         engine.startAnimation();
