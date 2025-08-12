@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useScreensaver } from '../contexts/ScreensaverContext';
 import ASCIICanvasIntegrated from './ASCIICanvasIntegrated';
 import QuoteOverlay from './QuoteOverlay';
@@ -11,7 +11,7 @@ const ScreensaverApp: React.FC = () => {
   const { config, state: screensaverState, currentQuote } = state;
   
   const [showConfigPanel, setShowConfigPanel] = useState(false);
-  const [showControls, setShowControls] = useState(false);
+  const [showControls, setShowControls] = useState(true);
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
   
   const containerRef = useRef<HTMLDivElement>(null);
@@ -33,66 +33,92 @@ const ScreensaverApp: React.FC = () => {
     return () => window.removeEventListener('resize', updateCanvasSize);
   }, []);
 
-  const getContainerClasses = () => {
-    const classes = ['screensaver-app'];
-    
-    if (screensaverState.isActive) {
-      classes.push('screensaver-active');
+  // Auto-advance quotes
+  useEffect(() => {
+    if (!config.autoMode || screensaverState.isPaused) {
+      return;
     }
-    
-    if (config.currentTheme) {
-      classes.push(`theme-${config.currentTheme}`);
-    }
-    
-    return classes.join(' ');
-  };
+
+    const interval = setInterval(() => {
+      actions.nextQuote();
+    }, config.transitionSpeed);
+
+    return () => clearInterval(interval);
+  }, [config.autoMode, config.transitionSpeed, screensaverState.isPaused, actions]);
 
   return (
     <ErrorBoundary>
       <div
         ref={containerRef}
-        className={getContainerClasses()}
-        role="application"
-        aria-label="ASCII Screensaver - The Way of Code"
+        className="screensaver-app"
+        style={{ 
+          width: '100vw', 
+          height: '100vh', 
+          position: 'relative',
+          backgroundColor: '#000000',
+          overflow: 'hidden'
+        }}
       >
-        <div className="canvas-layer">
+        {/* Canvas */}
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}>
           <ASCIICanvasIntegrated
             width={canvasSize.width}
             height={canvasSize.height}
-            className="main-canvas"
           />
         </div>
 
-        <div className="quote-layer">
+        {/* Quote */}
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 2, pointerEvents: 'none' }}>
           <QuoteOverlay
             quote={currentQuote}
-            isVisible={screensaverState.isActive || !config.autoMode}
+            isVisible={true}
             config={config}
-            className="main-quote-overlay"
           />
         </div>
 
-        <div className={`controls-layer ${showControls ? 'visible' : 'hidden'}`}>
+        {/* Controls */}
+        <div style={{ position: 'absolute', bottom: '20px', left: '50%', transform: 'translateX(-50%)', zIndex: 3 }}>
           <NavigationControls
-            isVisible={showControls && !screensaverState.isActive}
-            className="main-navigation-controls"
+            isVisible={showControls}
           />
-          
-          {!screensaverState.isActive && (
-            <button
-              className="settings-button"
-              onClick={() => setShowConfigPanel(prev => !prev)}
-              aria-label="Open settings"
-            >
-              ⚙️
-            </button>
-          )}
+        </div>
+
+        {/* Settings */}
+        <div style={{ position: 'absolute', top: '20px', right: '20px', zIndex: 3 }}>
+          <button
+            onClick={() => setShowConfigPanel(prev => !prev)}
+            style={{
+              padding: '10px',
+              backgroundColor: 'rgba(0, 255, 0, 0.2)',
+              color: '#00ff00',
+              border: '1px solid #00ff00',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            ⚙️
+          </button>
         </div>
 
         <ConfigurationPanel
           isVisible={showConfigPanel}
           onClose={() => setShowConfigPanel(false)}
         />
+
+        {/* Debug */}
+        <div style={{
+          position: 'absolute',
+          top: '10px',
+          left: '10px',
+          color: '#00ff00',
+          fontFamily: 'monospace',
+          fontSize: '12px',
+          zIndex: 4,
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          padding: '5px'
+        }}>
+          Pattern: {screensaverState.currentPattern} | Theme: {config.currentTheme} | Active: {screensaverState.isActive ? 'Yes' : 'No'}
+        </div>
       </div>
     </ErrorBoundary>
   );

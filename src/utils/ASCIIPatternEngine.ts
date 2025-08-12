@@ -231,8 +231,12 @@ export class ASCIIPatternEngine {
     patternConfig: PatternConfig = {} as PatternConfig
   ): Promise<void> {
     try {
-      // Load pattern lazily
-      const PatternClass = await this.patternLoader.loadPattern(patternName);
+      // Get pattern from registered patterns first, fallback to loader
+      let PatternClass = this.patterns.get(patternName);
+      if (!PatternClass) {
+        // Try to load pattern lazily as fallback
+        PatternClass = await this.patternLoader.loadPattern(patternName);
+      }
       
       const fullTransitionConfig: TransitionConfig = {
         type: 'fade',

@@ -17,7 +17,7 @@ const defaultConfig: Configuration = {
 
 // Default screensaver state
 const defaultState: ScreensaverState = {
-  isActive: false,
+  isActive: true,
   currentQuote: 0,
   currentPattern: 'matrix',
   isFullscreen: false,

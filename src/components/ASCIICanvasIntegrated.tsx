@@ -127,7 +127,7 @@ export const ASCIICanvasIntegrated: React.FC<ASCIICanvasProps> = ({
     const engine = engineRef.current;
     if (!engine || !isInitialized) return;
     
-    if (isActive && !isPaused) {
+    if (!isPaused) {
       engine.startAnimation();
       console.log('ASCIICanvasIntegrated: Animation started');
     } else {
@@ -135,7 +135,7 @@ export const ASCIICanvasIntegrated: React.FC<ASCIICanvasProps> = ({
       console.log('ASCIICanvasIntegrated: Animation stopped');
     }
     
-  }, [isActive, isPaused, isInitialized]);
+  }, [isPaused, isInitialized]);
   
   // Handle errors
   if (error) {
@@ -194,3 +194,6 @@ export const ASCIICanvasIntegrated: React.FC<ASCIICanvasProps> = ({
 };
 
 export default ASCIICanvasIntegrated;
+
+// Debug: Log when component mounts
+console.log('ASCIICanvasIntegrated: Component mounted');
