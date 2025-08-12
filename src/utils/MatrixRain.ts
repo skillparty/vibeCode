@@ -197,8 +197,9 @@ export class MatrixRain extends BasePattern {
         color = `rgba(0, 255, 0, ${opacity})`;
       } else {
         // Tail - darker green with fade
-        const greenIntensity = Math.floor(255 * opacity * 0.7);
-        color = `rgba(0, ${greenIntensity}, 0, ${opacity})`;
+        // Use theme-based colors instead of hardcoded green
+        const themeColor = this.getThemeColor();
+        color = `rgba(${themeColor.r}, ${themeColor.g}, ${themeColor.b}, ${opacity})`;
       }
       
       this.ctx.fillStyle = color;
@@ -243,6 +244,25 @@ export class MatrixRain extends BasePattern {
     }
   }
   
+  /**
+   * Get theme-based color values
+   */
+  private getThemeColor(): { r: number; g: number; b: number } {
+    const theme = this.config.currentTheme || 'matrix';
+    
+    switch (theme) {
+      case 'matrix':
+      case 'terminal':
+        return { r: 0, g: 255, b: 0 }; // Green
+      case 'retro':
+        return { r: 255, g: 0, b: 255 }; // Magenta
+      case 'blue':
+        return { r: 0, g: 153, b: 255 }; // Blue
+      default:
+        return { r: 0, g: 255, b: 0 }; // Default green
+    }
+  }
+
   /**
    * Apply speed configuration
    */
