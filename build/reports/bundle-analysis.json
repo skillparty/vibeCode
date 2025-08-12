@@ -1,0 +1,99 @@
+{
+  "timestamp": "2025-08-12T14:31:29.204Z",
+  "totalSize": 1082096,
+  "files": {
+    "js": [
+      {
+        "name": "403.fceb8bba.chunk.js",
+        "size": 7552,
+        "sizeKB": 7,
+        "type": "chunk"
+      },
+      {
+        "name": "403.fceb8bba.chunk.js.map",
+        "size": 25323,
+        "sizeKB": 25,
+        "type": "chunk"
+      },
+      {
+        "name": "409.e2619809.chunk.js",
+        "size": 8049,
+        "sizeKB": 8,
+        "type": "chunk"
+      },
+      {
+        "name": "409.e2619809.chunk.js.map",
+        "size": 26717,
+        "sizeKB": 26,
+        "type": "chunk"
+      },
+      {
+        "name": "519.44844234.chunk.js",
+        "size": 7595,
+        "sizeKB": 7,
+        "type": "chunk"
+      },
+      {
+        "name": "519.44844234.chunk.js.map",
+        "size": 20868,
+        "sizeKB": 20,
+        "type": "chunk"
+      },
+      {
+        "name": "681.3d8fced5.chunk.js",
+        "size": 6400,
+        "sizeKB": 6,
+        "type": "chunk"
+      },
+      {
+        "name": "681.3d8fced5.chunk.js.map",
+        "size": 19875,
+        "sizeKB": 19,
+        "type": "chunk"
+      },
+      {
+        "name": "740.3140062c.chunk.js",
+        "size": 5768,
+        "sizeKB": 6,
+        "type": "chunk"
+      },
+      {
+        "name": "740.3140062c.chunk.js.map",
+        "size": 16967,
+        "sizeKB": 17,
+        "type": "chunk"
+      },
+      {
+        "name": "main.bebe864d.js",
+        "size": 220554,
+        "sizeKB": 215,
+        "type": "main"
+      },
+      {
+        "name": "main.bebe864d.js.LICENSE.txt",
+        "size": 971,
+        "sizeKB": 1,
+        "type": "main"
+      },
+      {
+        "name": "main.bebe864d.js.map",
+        "size": 619217,
+        "sizeKB": 605,
+        "type": "main"
+      }
+    ],
+    "css": [
+      {
+        "name": "main.4b84c88f.css",
+        "size": 33268,
+        "sizeKB": 32
+      },
+      {
+        "name": "main.4b84c88f.css.map",
+        "size": 62972,
+        "sizeKB": 61
+      }
+    ],
+    "other": []
+  }
+}

@@ -53,7 +53,7 @@ export const useCustomQuotes = () => {
         // Validate and assign IDs
         const validQuotes = quotes
           .filter(validateQuoteStructure)
-          .map((quote, index) => ({
+          .map((quote: any, index: number) => ({
             ...quote,
             id: quote.id || Date.now() + index,
             isCustom: true
@@ -302,7 +302,7 @@ export const useCustomQuotes = () => {
 
       const validQuotes = parsed.quotes
         .filter(validateQuoteStructure)
-        .map((quote, index) => ({
+        .map((quote: any, index: number) => ({
           ...quote,
           id: Date.now() + index,
           isCustom: true,

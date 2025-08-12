@@ -99,15 +99,15 @@ const validateConfig = (config: any): Configuration => {
         break;
       
       case 'string':
-        if (typeof value === 'string' && (!schema.enum || schema.enum.includes(value as any))) {
+        if (typeof value === 'string' && (!schema.enum || (schema.enum as readonly string[]).includes(value))) {
           (validatedConfig as any)[key] = value;
         } else {
-          (validatedConfig as any)[key] = schema.default;
+          (validatedConfig as any)[key] = (schema as any).default;
         }
         break;
       
       default:
-        (validatedConfig as any)[key] = schema.default;
+        (validatedConfig as any)[key] = (schema as any).default;
     }
   }
 

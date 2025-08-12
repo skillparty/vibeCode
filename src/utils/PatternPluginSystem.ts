@@ -150,29 +150,34 @@ export class PatternPluginSystem {
     switch (patternName) {
       case 'matrix-rain':
         return {
-          ...baseConfig,
           characters: '01{}[]()<>/*+-=;:.,!@#$%^&',
-          dropSpeed: 2,
-          density: 0.8,
+          speed: 'medium',
+          density: 'high',
           glitchProbability: 0.02
         };
       case 'binary-waves':
         return {
           ...baseConfig,
           characters: '01',
+          speed: 'medium',
+          density: 'medium',
           waveLength: 20,
-          amplitude: 5,
-          frequency: 0.1
+          amplitude: 5
         };
       case 'geometric-flow':
         return {
-          ...baseConfig,
           characters: '/-\\|+*#',
-          rotationSpeed: 0.5,
-          complexity: 0.7
+          speed: 'medium',
+          density: 'medium',
+          rotationSpeed: 'medium',
+          complexity: 'medium'
         };
       default:
-        return baseConfig;
+        return {
+          characters: '01',
+          speed: 'medium',
+          density: 'medium'
+        };
     }
   }
 
@@ -306,12 +311,12 @@ export class PatternPluginSystem {
 
       // Register the plugin
       const pluginWithDefaults: PatternPlugin = {
-        category: 'animation',
-        tags: [],
-        author: 'Unknown',
-        description: '',
-        isEnabled: true,
-        ...plugin
+        ...plugin,
+        tags: plugin.tags || [],
+        author: plugin.author || 'Unknown',
+        description: plugin.description || '',
+        isEnabled: plugin.isEnabled !== false,
+        category: plugin.category || 'animation'
       };
 
       this.plugins.set(plugin.name, pluginWithDefaults);

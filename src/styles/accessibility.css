@@ -55,22 +55,57 @@
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
-  .screensaver-app {
-    --bg-color: #000000;
-    --text-color: #ffffff;
+  :root {
+    --primary-color: #ffffff;
+    --secondary-color: #ffffff;
+    --tertiary-color: #cccccc;
+    --background-color: #000000;
+    --surface-color: #000000;
+    --text-primary: #ffffff;
+    --text-secondary: #ffffff;
+    --text-tertiary: #cccccc;
     --accent-color: #ffff00;
+    --accent-hover: #ffff00;
+    --border-color: #ffffff;
+    --border-hover: #ffff00;
+    --shadow-color: transparent;
+    --glow-color: transparent;
+    --glass-bg: #000000;
+    --glass-border: #ffffff;
+    --glass-blur: none;
   }
   
-  .quote-overlay {
-    background: rgba(0, 0, 0, 0.9) !important;
-    color: #ffffff !important;
-    border: 2px solid #ffffff;
+  .quote-overlay .quote-container {
+    background: var(--background-color) !important;
+    color: var(--text-primary) !important;
+    border: 2px solid var(--border-color) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
   
   .configuration-panel {
-    background: #000000 !important;
-    color: #ffffff !important;
-    border: 2px solid #ffffff;
+    background: var(--background-color) !important;
+    color: var(--text-primary) !important;
+    border: 2px solid var(--border-color) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  
+  .navigation-controls {
+    background: var(--background-color) !important;
+    border: 2px solid var(--border-color) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  
+  .nav-button {
+    border: 2px solid var(--border-color) !important;
+  }
+  
+  .nav-button.active {
+    background: var(--accent-color) !important;
+    color: var(--background-color) !important;
+    border: 3px solid var(--accent-color) !important;
   }
 }
 

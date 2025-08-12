@@ -16,7 +16,18 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build:analyze": "npm run build && npx serve -s build",
+    "build:production": "GENERATE_SOURCEMAP=false react-scripts build",
+    "build:staging": "cross-env NODE_ENV=production REACT_APP_ENV=staging react-scripts build",
     "test": "react-scripts test",
+    "test:coverage": "react-scripts test --coverage --watchAll=false",
+    "test:performance": "react-scripts test --testNamePattern=\"Performance\" --watchAll=false",
+    "test:accessibility": "react-scripts test --testNamePattern=\"Accessibility\" --watchAll=false",
+    "test:integration": "react-scripts test --testNamePattern=\"Integration\" --watchAll=false",
+    "test:e2e": "node scripts/e2e-tests.js",
+    "test:all": "npm run test:coverage && npm run test:performance && npm run test:accessibility && npm run test:e2e",
+    "test:final": "npm run build:production && npm run test:all",
+    "optimize": "npm run build:production && node scripts/optimize-build.js",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -41,7 +52,13 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "@testing-library/react-hooks": "^8.0.1",
     "axe-core": "^4.10.3",
-    "jest-axe": "^10.0.0"
+    "jest-axe": "^10.0.0",
+    "jest-canvas-mock": "^2.5.2",
+    "jest-environment-jsdom": "^29.7.0",
+    "puppeteer": "^21.11.0",
+    "@types/puppeteer": "^7.0.4",
+    "cross-env": "^7.0.3"
   }
 }

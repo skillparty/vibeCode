@@ -1,0 +1,451 @@
+/* Main CSS file - ASCII Screensaver Application */
+/* This file imports all component styles and provides the complete styling system */
+
+/* Import order is important for CSS cascade */
+
+/* 1. Base styles and CSS custom properties */
+@import './index.css';
+
+/* 2. Responsive design system */
+@import './responsive.css';
+
+/* 3. Visual effects and animations */
+@import './effects.css';
+
+/* 4. Accessibility enhancements */
+@import './accessibility.css';
+
+/* 5. Component-specific styles */
+@import './App.css';
+@import './QuoteOverlay.css';
+@import './ConfigurationPanel.css';
+@import './NavigationControls.css';
+
+/* Additional component-specific enhancements */
+
+/* ASCII Canvas enhancements */
+.ascii-canvas-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--background-color);
+}
+
+.ascii-canvas-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, var(--primary-color) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, var(--secondary-color) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, var(--tertiary-color) 0%, transparent 50%);
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 1;
+  animation: subtle-shift 20s ease-in-out infinite;
+}
+
+@keyframes subtle-shift {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.03;
+  }
+  50% {
+    transform: scale(1.1) rotate(1deg);
+    opacity: 0.05;
+  }
+}
+
+/* Enhanced loading states */
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+  animation: fadeIn var(--transition-base);
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+  text-align: center;
+}
+
+.loading-text {
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-lg);
+  text-shadow: 0 0 10px var(--glow-color);
+}
+
+.loading-progress {
+  width: 200px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.loading-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+  border-radius: 2px;
+  animation: loading-progress 2s ease-in-out infinite;
+}
+
+@keyframes loading-progress {
+  0% {
+    width: 0%;
+    transform: translateX(-100%);
+  }
+  50% {
+    width: 100%;
+    transform: translateX(0%);
+  }
+  100% {
+    width: 100%;
+    transform: translateX(100%);
+  }
+}
+
+/* Error states */
+.error-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 0, 0, 0.1);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+  animation: fadeIn var(--transition-base);
+}
+
+.error-content {
+  background: var(--glass-bg);
+  border: 1px solid #ff4444;
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl);
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(255, 68, 68, 0.3);
+}
+
+.error-title {
+  color: #ff6666;
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  margin-bottom: var(--space-md);
+  font-family: var(--font-mono);
+}
+
+.error-message {
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  margin-bottom: var(--space-lg);
+}
+
+.error-actions {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+}
+
+/* Status indicators */
+.status-indicator-container {
+  position: fixed;
+  top: var(--space-lg);
+  left: var(--space-lg);
+  z-index: var(--z-overlay);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.status-indicator-item {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-xs);
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  opacity: 0;
+  transform: translateX(-100%);
+  animation: slideInLeft var(--transition-base) forwards;
+}
+
+.status-indicator-item.success {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.status-indicator-item.warning {
+  border-color: #ff9500;
+  color: #ff9500;
+}
+
+.status-indicator-item.error {
+  border-color: #ff4444;
+  color: #ff4444;
+}
+
+@keyframes slideInLeft {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Tooltip system */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-content {
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-xs);
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-base);
+  z-index: var(--z-tooltip);
+}
+
+.tooltip-content::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--glass-border);
+}
+
+.tooltip:hover .tooltip-content {
+  opacity: 1;
+}
+
+/* Context menu */
+.context-menu {
+  position: fixed;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) 0;
+  min-width: 200px;
+  z-index: var(--z-popover);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  animation: scaleIn var(--transition-fast);
+}
+
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background-color var(--transition-base);
+}
+
+.context-menu-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.context-menu-item.disabled {
+  color: var(--text-tertiary);
+  cursor: not-allowed;
+}
+
+.context-menu-item.disabled:hover {
+  background: none;
+}
+
+.context-menu-separator {
+  height: 1px;
+  background: var(--border-color);
+  margin: var(--space-sm) 0;
+}
+
+/* Notification system */
+.notification-container {
+  position: fixed;
+  top: var(--space-lg);
+  right: var(--space-lg);
+  z-index: var(--z-tooltip);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  max-width: 400px;
+}
+
+.notification {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  animation: slideInRight var(--transition-base);
+  position: relative;
+}
+
+.notification.success {
+  border-left: 4px solid var(--accent-color);
+}
+
+.notification.warning {
+  border-left: 4px solid #ff9500;
+}
+
+.notification.error {
+  border-left: 4px solid #ff4444;
+}
+
+.notification-title {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+  font-family: var(--font-mono);
+}
+
+.notification-message {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.notification-close {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: var(--font-size-lg);
+  transition: color var(--transition-base);
+}
+
+.notification-close:hover {
+  color: var(--text-primary);
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Performance optimizations for all elements */
+* {
+  /* Improve text rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* GPU acceleration for animated elements */
+.ascii-canvas,
+.quote-overlay,
+.navigation-controls,
+.configuration-panel,
+.settings-button {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Contain layout and paint for performance */
+.screensaver-main,
+.ascii-canvas-section,
+.quote-overlay-section {
+  contain: layout style paint;
+}
+
+/* Will-change for elements that will animate */
+.nav-button,
+.theme-option,
+.tab-button,
+.close-button {
+  will-change: transform, background-color, border-color;
+}
+
+/* Remove will-change after animations complete */
+.nav-button:not(:hover):not(:focus),
+.theme-option:not(:hover):not(:focus),
+.tab-button:not(:hover):not(:focus),
+.close-button:not(:hover):not(:focus) {
+  will-change: auto;
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .ascii-canvas-container::before,
+  .loading-progress-bar,
+  .subtle-shift {
+    animation: none;
+  }
+  
+  .status-indicator-item {
+    animation: none;
+    opacity: 1;
+    transform: translateX(0);
+  }
+  
+  .notification {
+    animation: none;
+  }
+}
+
+/* Print optimizations */
+@media print {
+  .loading-overlay,
+  .error-overlay,
+  .status-indicator-container,
+  .notification-container,
+  .context-menu,
+  .tooltip-content {
+    display: none !important;
+  }
+}

@@ -245,7 +245,7 @@ export const useAdvancedQuoteSearch = (
       if (filters.dateRange.start || filters.dateRange.end) {
         filtered = filtered.filter(quote => {
           const customQuote = customQuotes.find(custom => custom.id === quote.id);
-          if (!customQuote || !customQuote.dateAdded) return false;
+          if (!customQuote || !('dateAdded' in customQuote) || typeof customQuote.dateAdded !== 'number') return false;
 
           const quoteDate = new Date(customQuote.dateAdded);
           
@@ -311,8 +311,8 @@ export const useAdvancedQuoteSearch = (
           case 'dateAdded':
             const aCustom = customQuotes.find(c => c.id === a.quote.id);
             const bCustom = customQuotes.find(c => c.id === b.quote.id);
-            const aDate = aCustom?.dateAdded || 0;
-            const bDate = bCustom?.dateAdded || 0;
+            const aDate = (aCustom && 'dateAdded' in aCustom && typeof aCustom.dateAdded === 'number') ? aCustom.dateAdded : 0;
+            const bDate = (bCustom && 'dateAdded' in bCustom && typeof bCustom.dateAdded === 'number') ? bCustom.dateAdded : 0;
             return filters.sortOrder === 'desc' ? bDate - aDate : aDate - bDate;
           
           default:
@@ -381,9 +381,9 @@ export const useAdvancedQuoteSearch = (
 
   // Get unique values for filter options
   const getFilterOptions = useCallback(() => {
-    const categories = [...new Set(allQuotes.map(q => q.category))].sort();
-    const authors = [...new Set(allQuotes.map(q => q.author))].sort();
-    const tags = [...new Set(allQuotes.flatMap(q => q.tags))].sort();
+    const categories = Array.from(new Set(allQuotes.map(q => q.category))).sort();
+    const authors = Array.from(new Set(allQuotes.map(q => q.author))).sort();
+    const tags = Array.from(new Set(allQuotes.flatMap(q => q.tags))).sort();
 
     return { categories, authors, tags };
   }, [allQuotes]);

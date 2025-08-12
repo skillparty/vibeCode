@@ -288,7 +288,7 @@ export class ConfigurationManager {
       
       // Import favorites
       if (Array.isArray(parsed.favorites)) {
-        this.favorites = new Set(parsed.favorites.filter(id => typeof id === 'number'));
+        this.favorites = new Set(parsed.favorites.filter((id: any) => typeof id === 'number'));
       }
       
       // Save both
@@ -354,7 +354,7 @@ export class ConfigurationManager {
       
       // Restore favorites
       if (Array.isArray(parsed.favorites)) {
-        this.favorites = new Set(parsed.favorites.filter(id => typeof id === 'number'));
+        this.favorites = new Set(parsed.favorites.filter((id: any) => typeof id === 'number'));
       }
       
       // Save restored settings

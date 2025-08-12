@@ -110,7 +110,7 @@ export const useFavoritesPersistence = () => {
 
   // Import favorites from array
   const importFavorites = useCallback((favoriteIds: number[]): ConfigPersistenceResult => {
-    const newFavorites = new Set(favoriteIds.filter(id => typeof id === 'number'));
+    const newFavorites = new Set(favoriteIds.filter((id: any) => typeof id === 'number'));
     setFavorites(newFavorites);
     return safeSaveFavorites(newFavorites);
   }, []);

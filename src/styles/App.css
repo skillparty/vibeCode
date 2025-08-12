@@ -1,43 +1,86 @@
-/* Main application styles */
+/* Main application styles with CSS Grid and enhanced theming */
 
 .app {
   width: 100vw;
   height: 100vh;
   display: grid;
   grid-template-areas: 
-    "header header"
-    "main controls"
-    "footer footer";
+    "header header header"
+    "main main controls"
+    "footer footer footer";
   grid-template-rows: auto 1fr auto;
-  grid-template-columns: 1fr auto;
-  background: #000;
+  grid-template-columns: 1fr auto auto;
+  background: var(--background-color);
   overflow: hidden;
+  position: relative;
+  
+  /* Performance optimizations */
+  contain: layout style;
+  will-change: background-color;
 }
 
+/* Skip links for accessibility */
+.skip-links {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: var(--z-tooltip);
+}
+
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: var(--space-sm);
+  background: var(--surface-color);
+  color: var(--text-primary);
+  padding: var(--space-sm) var(--space-md);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  border: 1px solid var(--border-color);
+  transition: top var(--transition-base);
+}
+
+.skip-link:focus {
+  top: var(--space-sm);
+}
+
+/* Header - Hidden but accessible */
 .app-header {
   grid-area: header;
-  height: 0; /* Hidden but accessible */
+  height: 0;
+  overflow: hidden;
+  position: relative;
 }
 
+.app-title {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+}
+
+/* Main screensaver area */
 .screensaver-main {
   grid-area: main;
   position: relative;
   width: 100%;
   height: 100%;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   
   /* Performance optimizations */
   contain: layout style paint;
   will-change: contents;
 }
 
+/* ASCII Canvas Section */
 .ascii-canvas-section {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
+  inset: 0;
+  z-index: var(--z-background);
   
   /* Performance optimizations */
   contain: layout style paint;
@@ -48,7 +91,7 @@
   width: 100%;
   height: 100%;
   display: block;
-  background: #000000;
+  background: var(--background-color);
   border: none;
   outline: none;
   image-rendering: pixelated;
@@ -66,33 +109,35 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #111111;
+  background-color: var(--surface-color);
   color: #ff4444;
   border: 2px solid #ff4444;
+  font-family: var(--font-mono);
 }
 
 .error-message {
   text-align: center;
-  padding: 20px;
+  padding: var(--space-xl);
+  max-width: 400px;
 }
 
 .error-message h3 {
-  margin: 0 0 10px 0;
+  margin: 0 0 var(--space-md) 0;
   color: #ff6666;
+  font-size: var(--font-size-xl);
 }
 
 .error-message p {
-  margin: 5px 0;
-  font-size: 14px;
+  margin: var(--space-sm) 0;
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
 }
 
+/* Quote Overlay Section */
 .quote-overlay-section {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
+  inset: 0;
+  z-index: var(--z-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -103,45 +148,65 @@
   will-change: opacity, transform;
 }
 
-.quote-display {
-  max-width: 80%;
-  text-align: center;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(10px);
-  border-radius: 10px;
-  padding: 2rem;
-  border: 1px solid rgba(0, 255, 0, 0.3);
-  
-  /* Performance optimizations */
-  contain: layout style;
-  will-change: opacity, transform;
-  transform: translateZ(0); /* Force hardware acceleration */
+/* Settings Button */
+.settings-button {
+  position: fixed;
+  top: var(--space-lg);
+  right: var(--space-lg);
+  z-index: var(--z-modal);
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  font-size: var(--font-size-lg);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  animation: fadeIn var(--transition-slow) var(--transition-slow) forwards;
 }
 
-.quote-text {
-  font-size: 1.5rem;
-  line-height: 1.6;
-  margin-bottom: 1rem;
-  color: #00ff00;
+.settings-button:hover {
+  background: var(--surface-color);
+  border-color: var(--accent-color);
+  transform: scale(1.1);
+  box-shadow: 0 0 20px var(--glow-color);
 }
 
-.quote-author {
-  font-size: 1rem;
-  color: #00cc00;
-  font-style: italic;
+.settings-button:focus {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
 }
 
+.settings-button:active {
+  transform: scale(0.95);
+}
+
+/* Controls Panel */
 .controls-panel {
   grid-area: controls;
-  width: 300px;
-  background: rgba(0, 0, 0, 0.9);
-  border-left: 1px solid rgba(0, 255, 0, 0.3);
-  padding: 1rem;
+  width: 320px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-left: 1px solid var(--glass-border);
+  padding: var(--space-lg);
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--space-lg);
   transform: translateX(100%);
-  transition: transform 0.3s ease;
+  transition: transform var(--transition-base);
+  z-index: var(--z-overlay);
+  
+  /* Scrollable content */
+  overflow-y: auto;
+  max-height: 100vh;
 }
 
 .controls-panel:hover,
@@ -149,57 +214,158 @@
   transform: translateX(0);
 }
 
-.navigation-controls {
+.controls-panel.open {
+  transform: translateX(0);
+}
+
+/* Navigation Controls within panel */
+.panel-navigation {
   display: flex;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.nav-button-group {
+  display: flex;
+  gap: var(--space-sm);
 }
 
 .nav-button {
   flex: 1;
-  padding: 0.5rem;
-  background: rgba(0, 255, 0, 0.1);
-  border: 1px solid #00ff00;
-  color: #00ff00;
-  font-family: inherit;
+  padding: var(--space-md);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
 }
 
 .nav-button:hover {
-  background: rgba(0, 255, 0, 0.2);
-  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 10px var(--glow-color);
+  transform: translateY(-1px);
 }
 
 .nav-button:active {
-  transform: scale(0.95);
+  transform: translateY(0) scale(0.98);
 }
 
-.configuration-panel {
+.nav-button.active {
+  background: var(--accent-color);
+  color: var(--background-color);
+  border-color: var(--accent-color);
+}
+
+.nav-button-icon {
+  font-size: var(--font-size-base);
+  line-height: 1;
+}
+
+/* Configuration Panel within controls */
+.configuration-section {
   flex: 1;
-}
-
-.config-controls {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-lg);
 }
 
+.config-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.config-group-title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Footer */
 .app-footer {
   grid-area: footer;
-  height: 30px;
-  background: rgba(0, 0, 0, 0.9);
-  border-top: 1px solid rgba(0, 255, 0, 0.3);
+  height: 40px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-top: 1px solid var(--glass-border);
   display: flex;
   align-items: center;
-  padding: 0 1rem;
+  justify-content: space-between;
+  padding: 0 var(--space-lg);
+  z-index: var(--z-base);
 }
 
 .status-bar {
-  font-size: 0.8rem;
-  color: #00cc00;
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
 }
 
-/* Responsive design */
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--accent-color);
+  animation: pulse 2s infinite;
+}
+
+.status-indicator.inactive {
+  background: var(--text-tertiary);
+  animation: none;
+}
+
+/* Performance indicator */
+.performance-stats {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+}
+
+.fps-counter,
+.memory-usage {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.fps-counter.low-fps {
+  color: #ff6b35;
+}
+
+.memory-usage.high-memory {
+  color: #ff6b35;
+}
+
+/* Responsive design with mobile-first approach */
+@media (max-width: 1024px) {
+  .controls-panel {
+    width: 280px;
+  }
+}
+
 @media (max-width: 768px) {
   .app {
     grid-template-areas: 
@@ -215,11 +381,110 @@
     width: 100%;
     transform: translateY(100%);
     border-left: none;
-    border-top: 1px solid rgba(0, 255, 0, 0.3);
+    border-top: 1px solid var(--glass-border);
+    max-height: 60vh;
   }
   
   .controls-panel:hover,
-  .controls-panel:focus-within {
+  .controls-panel:focus-within,
+  .controls-panel.open {
     transform: translateY(0);
+  }
+  
+  .settings-button {
+    top: var(--space-md);
+    right: var(--space-md);
+    width: 44px;
+    height: 44px;
+  }
+  
+  .nav-button-group {
+    flex-wrap: wrap;
+  }
+  
+  .nav-button {
+    min-width: 0;
+    flex: 1 1 calc(50% - var(--space-xs));
+  }
+}
+
+@media (max-width: 480px) {
+  .app-footer {
+    height: 36px;
+    padding: 0 var(--space-md);
+  }
+  
+  .status-bar {
+    gap: var(--space-md);
+    font-size: 10px;
+  }
+  
+  .performance-stats {
+    display: none; /* Hide on very small screens */
+  }
+  
+  .controls-panel {
+    padding: var(--space-md);
+    gap: var(--space-md);
+    max-height: 70vh;
+  }
+  
+  .settings-button {
+    width: 40px;
+    height: 40px;
+    font-size: var(--font-size-base);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .controls-panel,
+  .nav-button,
+  .settings-button {
+    transition: none;
+  }
+  
+  .status-indicator {
+    animation: none;
+  }
+  
+  .settings-button {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .controls-panel,
+  .app-footer,
+  .settings-button {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--background-color);
+    border-width: 2px;
+  }
+  
+  .nav-button {
+    border-width: 2px;
+  }
+  
+  .nav-button.active {
+    border-width: 3px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .controls-panel,
+  .settings-button,
+  .app-footer {
+    display: none;
+  }
+  
+  .app {
+    grid-template-areas: "main";
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr;
   }
 }
