@@ -483,6 +483,29 @@ export class ASCIIPatternEngine {
       this.initializeCanvas();
     }
   }
+
+  /**
+   * Update theme for current pattern
+   */
+  public updateTheme(theme: string): void {
+    if (this.currentPattern && 'setConfig' in this.currentPattern) {
+      (this.currentPattern as any).setConfig({ currentTheme: theme });
+    }
+    
+    // Update engine colors based on theme
+    const themeColors = {
+      matrix: { bg: '#000000', fg: '#00ff00' },
+      terminal: { bg: '#0a0a0a', fg: '#00ff00' },
+      retro: { bg: '#1a0033', fg: '#ff00ff' },
+      blue: { bg: '#000033', fg: '#0099ff' }
+    };
+    
+    const colors = themeColors[theme as keyof typeof themeColors] || themeColors.matrix;
+    this.updateConfig({
+      backgroundColor: colors.bg,
+      foregroundColor: colors.fg
+    });
+  }
   
   /**
    * Register built-in patterns (now handled by PatternLoader)

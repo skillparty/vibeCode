@@ -120,7 +120,7 @@ export const ASCIICanvasIntegrated: React.FC<ASCIICanvasProps> = ({
     };
     
     switchToPattern();
-  }, [currentPattern, transitionEffect, currentTheme, isInitialized]);
+  }, [currentPattern, transitionEffect, currentTheme, transitionSpeed, isInitialized]);
   
   // Handle active state and pause changes
   useEffect(() => {
@@ -195,5 +195,5 @@ export const ASCIICanvasIntegrated: React.FC<ASCIICanvasProps> = ({
 
 export default ASCIICanvasIntegrated;
 
-// Debug: Log when component mounts
-console.log('ASCIICanvasIntegrated: Component mounted');
+
+export default ASCIICanvasIntegrated;

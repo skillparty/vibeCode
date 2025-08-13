@@ -1,0 +1,155 @@
+/* Theme System for ASCII Screensaver */
+
+/* Base theme variables */
+:root {
+  /* Default (Matrix) theme */
+  --theme-bg-primary: #000000;
+  --theme-bg-secondary: #001100;
+  --theme-text-primary: #00ff00;
+  --theme-text-secondary: #008800;
+  --theme-accent: #00ff41;
+  --theme-glow: #00ff0080;
+}
+
+/* Matrix Theme */
+.theme-matrix {
+  --theme-bg-primary: #000000;
+  --theme-bg-secondary: #001100;
+  --theme-text-primary: #00ff00;
+  --theme-text-secondary: #008800;
+  --theme-accent: #00ff41;
+  --theme-glow: #00ff0080;
+}
+
+/* Terminal Theme */
+.theme-terminal {
+  --theme-bg-primary: #0a0a0a;
+  --theme-bg-secondary: #001a00;
+  --theme-text-primary: #00ff00;
+  --theme-text-secondary: #00cc00;
+  --theme-accent: #00ff00;
+  --theme-glow: #00ff0080;
+}
+
+/* Retro Theme */
+.theme-retro {
+  --theme-bg-primary: #1a0033;
+  --theme-bg-secondary: #2d0052;
+  --theme-text-primary: #ff00ff;
+  --theme-text-secondary: #cc00cc;
+  --theme-accent: #ff6b35;
+  --theme-glow: #ff00ff80;
+}
+
+/* Blue Theme */
+.theme-blue {
+  --theme-bg-primary: #000033;
+  --theme-bg-secondary: #001428;
+  --theme-text-primary: #0099ff;
+  --theme-text-secondary: #0066cc;
+  --theme-accent: #00bfff;
+  --theme-glow: #0099ff80;
+}
+
+/* Apply theme colors to screensaver app */
+.screensaver-app {
+  background-color: var(--theme-bg-primary);
+  color: var(--theme-text-primary);
+}
+
+/* Canvas layer theming */
+.canvas-layer {
+  background-color: var(--theme-bg-primary);
+}
+
+/* Quote overlay theming */
+.quote-overlay {
+  color: var(--theme-text-primary);
+}
+
+.quote-text {
+  color: var(--theme-text-primary);
+  text-shadow: 0 0 10px var(--theme-glow);
+}
+
+.quote-author {
+  color: var(--theme-text-secondary);
+}
+
+/* Controls theming */
+.navigation-controls {
+  background-color: var(--theme-bg-secondary);
+  border: 1px solid var(--theme-accent);
+}
+
+.nav-button {
+  color: var(--theme-text-primary);
+  border-color: var(--theme-accent);
+}
+
+.nav-button:hover {
+  background-color: var(--theme-accent);
+  color: var(--theme-bg-primary);
+  box-shadow: 0 0 10px var(--theme-glow);
+}
+
+/* Settings button theming */
+.settings-button {
+  background-color: var(--theme-bg-secondary);
+  color: var(--theme-text-primary);
+  border: 1px solid var(--theme-accent);
+}
+
+.settings-button:hover {
+  background-color: var(--theme-accent);
+  color: var(--theme-bg-primary);
+  box-shadow: 0 0 15px var(--theme-glow);
+}
+
+/* Configuration panel theming */
+.configuration-panel {
+  background-color: var(--theme-bg-primary);
+  border: 1px solid var(--theme-accent);
+  color: var(--theme-text-primary);
+}
+
+.config-header {
+  border-bottom: 1px solid var(--theme-accent);
+}
+
+.tab-button.active {
+  background-color: var(--theme-accent);
+  color: var(--theme-bg-primary);
+}
+
+/* Debug info theming */
+.debug-info {
+  background-color: var(--theme-bg-secondary);
+  color: var(--theme-text-primary);
+  border: 1px solid var(--theme-accent);
+}
+
+/* Smooth transitions for theme changes */
+.screensaver-app,
+.canvas-layer,
+.quote-overlay,
+.navigation-controls,
+.settings-button,
+.configuration-panel {
+  transition: 
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .screensaver-app,
+  .canvas-layer,
+  .quote-overlay,
+  .navigation-controls,
+  .settings-button,
+  .configuration-panel {
+    transition: none;
+  }
+}
