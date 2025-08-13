@@ -27,6 +27,11 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({ isVisible, onCl
     updateConfig({ currentTheme: theme });
   };
 
+  // Handle pattern selection
+  const handlePatternChange = (pattern: string) => {
+    actions.setCurrentPattern(pattern);
+  };
+
   // Handle transition speed change
   const handleSpeedChange = (speed: number) => {
     updateConfig({ transitionSpeed: speed });
@@ -146,6 +151,39 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({ isVisible, onCl
                     >
                       <div className={`theme-preview theme-${theme}`}></div>
                       <span className="theme-name">{theme.charAt(0).toUpperCase() + theme.slice(1)}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Pattern Selection */}
+              <div className="config-group">
+                <label className="config-label">ASCII Pattern</label>
+                <div className="pattern-selector" role="radiogroup" aria-label="Pattern selection">
+                  {([
+                    { id: 'matrix', name: 'Matrix Rain', description: 'Classic falling characters' },
+                    { id: 'binary', name: 'Binary Waves', description: 'Sine wave patterns with binary' },
+                    { id: 'geometric', name: 'Geometric Flow', description: 'Flowing geometric shapes' },
+                    { id: 'simple', name: 'Simple Test', description: 'Basic test pattern' }
+                  ]).map((pattern) => (
+                    <button
+                      key={pattern.id}
+                      className={`pattern-option ${state.state.currentPattern === pattern.id ? 'selected' : ''}`}
+                      onClick={() => handlePatternChange(pattern.id)}
+                      role="radio"
+                      aria-checked={state.state.currentPattern === pattern.id}
+                      aria-label={`${pattern.name} pattern`}
+                      title={pattern.description}
+                    >
+                      <div className={`pattern-preview pattern-${pattern.id}`}>
+                        <span className="pattern-icon">
+                          {pattern.id === 'matrix' && '⚡'}
+                          {pattern.id === 'binary' && '〜'}
+                          {pattern.id === 'geometric' && '◆'}
+                          {pattern.id === 'simple' && '▣'}
+                        </span>
+                      </div>
+                      <span className="pattern-name">{pattern.name}</span>
                     </button>
                   ))}
                 </div>
