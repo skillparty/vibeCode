@@ -247,7 +247,20 @@ export class ASCIIPatternEngine {
 
       // Create new pattern instance
       const newPattern = new PatternClass(this.ctx, patternConfig);
+      
+      // Ensure pattern has correct grid dimensions
+      if ('onResize' in newPattern) {
+        (newPattern as any).onResize(this.gridWidth, this.gridHeight);
+      }
+      
       newPattern.initialize();
+      
+      console.log('ASCIIPatternEngine: Pattern created and initialized:', {
+        patternName,
+        gridWidth: this.gridWidth,
+        gridHeight: this.gridHeight,
+        canvasSize: { width: this.canvas.width, height: this.canvas.height }
+      });
 
       if (this.useMultiLayer) {
         // Multi-layer transition

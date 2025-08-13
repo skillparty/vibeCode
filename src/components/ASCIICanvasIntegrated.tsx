@@ -4,6 +4,7 @@ import { TestPattern } from '../utils/BasePattern';
 import { MatrixRain } from '../utils/MatrixRain';
 import { BinaryWaves } from '../utils/BinaryWaves';
 import { GeometricFlow } from '../utils/GeometricFlow';
+import { SimpleTestPattern } from '../utils/SimpleTestPattern';
 import { PatternConfig } from '../types';
 import { useScreensaver } from '../contexts/ScreensaverContext';
 
@@ -58,6 +59,7 @@ export const ASCIICanvasIntegrated: React.FC<ASCIICanvasProps> = ({
       
       // Register all available patterns
       engine.registerPattern('test', TestPattern);
+      engine.registerPattern('simple', SimpleTestPattern);
       engine.registerPattern('matrix', MatrixRain);
       engine.registerPattern('binary', BinaryWaves);
       engine.registerPattern('geometric', GeometricFlow);
@@ -181,10 +183,14 @@ export const ASCIICanvasIntegrated: React.FC<ASCIICanvasProps> = ({
       width={width}
       height={height}
       style={{ 
-        width: `${width}px`, 
-        height: `${height}px`,
+        width: '100%', 
+        height: '100%',
         display: 'block',
-        backgroundColor: '#000000'
+        backgroundColor: '#000000',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        objectFit: 'cover'
       }}
       role="img"
       aria-label={`ASCII pattern animation: ${currentPattern}`}

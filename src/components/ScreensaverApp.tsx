@@ -18,13 +18,10 @@ const ScreensaverApp: React.FC = () => {
 
   useEffect(() => {
     const updateCanvasSize = () => {
-      const container = containerRef.current;
-      if (!container) return;
-
-      const rect = container.getBoundingClientRect();
+      // Use full window dimensions for true fullscreen coverage
       setCanvasSize({
-        width: rect.width || window.innerWidth,
-        height: rect.height || window.innerHeight
+        width: window.innerWidth,
+        height: window.innerHeight
       });
     };
 
