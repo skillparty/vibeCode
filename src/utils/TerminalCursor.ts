@@ -149,9 +149,8 @@ export class TerminalCursor extends BasePattern {
   }
   
   public render(): void {
-    // Clear canvas with terminal background
-    this.ctx.fillStyle = this.backgroundColor;
-    this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    // Clear canvas with terminal background - ensures 100% coverage
+    this.fillBackground(this.backgroundColor);
     
     if (!this.isInitialized) return;
     

@@ -160,9 +160,8 @@ export class MatrixRain extends BasePattern {
   }
   
   public render(): void {
-    // Always clear canvas with black background
-    this.ctx.fillStyle = '#000000';
-    this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    // Always clear canvas with black background - ensures 100% coverage
+    this.fillBackground('#000000');
     
     if (!this.isInitialized) return;
     

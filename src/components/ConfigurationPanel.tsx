@@ -164,7 +164,7 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({ isVisible, onCl
                     { id: 'matrix', name: 'Matrix Rain', description: 'Classic falling characters' },
                     { id: 'binary', name: 'Binary Waves', description: 'Sine wave patterns with binary' },
                     { id: 'geometric', name: 'Geometric Flow', description: 'Flowing geometric shapes' },
-                    { id: 'simple', name: 'Simple Test', description: 'Basic test pattern' }
+                    { id: 'simple', name: 'Digital Waterfall', description: 'Cascada digital con efectos visuales' }
                   ]).map((pattern) => (
                     <button
                       key={pattern.id}
@@ -180,7 +180,7 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({ isVisible, onCl
                           {pattern.id === 'matrix' && '⚡'}
                           {pattern.id === 'binary' && '〜'}
                           {pattern.id === 'geometric' && '◆'}
-                          {pattern.id === 'simple' && '▣'}
+                          {pattern.id === 'simple' && '💧'}
                         </span>
                       </div>
                       <span className="pattern-name">{pattern.name}</span>

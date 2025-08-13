@@ -141,6 +141,27 @@ export class ASCIIPatternEngine {
     // Calculate grid dimensions based on canvas size
     this.gridWidth = Math.floor(this.canvas.width / this.charWidth);
     this.gridHeight = Math.floor(this.canvas.height / this.charHeight);
+    
+    // CRITICAL FIX: Adjust canvas size to match grid exactly
+    // This ensures no black spaces remain
+    const exactWidth = this.gridWidth * this.charWidth;
+    const exactHeight = this.gridHeight * this.charHeight;
+    
+    // Only resize if there's a significant difference
+    if (Math.abs(this.canvas.width - exactWidth) > 1 || Math.abs(this.canvas.height - exactHeight) > 1) {
+      this.canvas.width = exactWidth;
+      this.canvas.height = exactHeight;
+      
+      // Reapply canvas styles after resize
+      this.canvas.style.width = '100%';
+      this.canvas.style.height = '100%';
+      this.canvas.style.objectFit = 'fill';
+      
+      // Reconfigure context after canvas resize
+      this.ctx.font = `${this.config.fontSize}px ${this.config.fontFamily}`;
+      this.ctx.textBaseline = 'top';
+      this.ctx.textAlign = 'left';
+    }
   }
   
   /**

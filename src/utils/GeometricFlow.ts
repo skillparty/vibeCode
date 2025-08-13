@@ -148,9 +148,8 @@ export class GeometricFlow extends BasePattern {
   public render(): void {
     if (!this.isInitialized) return;
     
-    // Clear canvas with fade effect
-    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-    this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    // Clear canvas with black background to ensure full coverage
+    this.fillBackground('#000000');
     
     // Render shapes
     this.shapes.forEach(shape => {

@@ -148,6 +148,9 @@ export class BinaryWaves extends BasePattern {
   
   public render(): void {
     if (!this.isInitialized) return;
+
+    // Clear canvas with black background to ensure full coverage
+    this.fillBackground('#000000');
     
     // Set font and color based on theme
     this.ctx.fillStyle = this.getWaveColor();

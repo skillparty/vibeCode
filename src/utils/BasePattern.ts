@@ -109,6 +109,15 @@ export abstract class BasePattern implements Pattern {
   }
   
   /**
+   * Utility method to fill entire canvas background
+   * This ensures 100% coverage without black spaces
+   */
+  protected fillBackground(color: string = '#000000'): void {
+    this.ctx.fillStyle = color;
+    this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+  }
+  
+  /**
    * Utility method to get random character from pattern's character set
    */
   protected getRandomChar(): string {

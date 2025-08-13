@@ -291,9 +291,8 @@ export class NetworkNodes extends BasePattern {
   }
   
   public render(): void {
-    // Clear canvas with dark background
-    this.ctx.fillStyle = this.getBackgroundColor();
-    this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    // Clear canvas with dark background - ensures 100% coverage
+    this.fillBackground(this.getBackgroundColor());
     
     if (!this.isInitialized) return;
     

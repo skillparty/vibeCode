@@ -365,7 +365,7 @@
 }
 
 .pattern-preview.pattern-simple {
-  background: linear-gradient(135deg, #333 0%, #666 50%, #999 100%);
+  background: linear-gradient(135deg, #001122 0%, #003366 30%, #0066cc 70%, #00ccff 100%);
 }
 
 .pattern-icon {
