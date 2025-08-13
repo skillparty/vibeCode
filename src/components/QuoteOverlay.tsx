@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Quote, Configuration } from '../types';
+import TypewriterText from './TypewriterText';
 import '../styles/QuoteOverlay.css';
 
 interface QuoteOverlayProps {
@@ -147,7 +148,7 @@ export const QuoteOverlay: React.FC<QuoteOverlayProps> = ({
               fontSize: fontSizes.text
             }}
           >
-            "{displayQuote.text}"
+            "{config.transitionEffect === "typewriter" ? <TypewriterText text={displayQuote.text} speed={50} onComplete={onTransitionComplete} /> : displayQuote.text}"
           </blockquote>
 
           {/* Quote author and metadata */}

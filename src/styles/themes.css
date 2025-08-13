@@ -142,6 +142,28 @@
     border-color 0.3s ease;
 }
 
+/* Typewriter effect */
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.typewriter-cursor {
+  animation: blink 1s infinite;
+}
+
+/* Typewriter transition effect */
+.quote-overlay.transition-typewriter .quote-text {
+  overflow: hidden;
+  white-space: nowrap;
+  animation: typewriter 2s steps(40, end);
+}
+
+@keyframes typewriter {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   .screensaver-app,
@@ -151,5 +173,15 @@
   .settings-button,
   .configuration-panel {
     transition: none;
+  }
+  
+  .typewriter-cursor {
+    animation: none;
+    opacity: 1;
+  }
+  
+  .quote-overlay.transition-typewriter .quote-text {
+    animation: none;
+    width: 100%;
   }
 }
