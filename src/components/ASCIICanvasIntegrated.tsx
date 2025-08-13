@@ -193,7 +193,6 @@ export const ASCIICanvasIntegrated: React.FC<ASCIICanvasProps> = ({
   );
 };
 
-export default ASCIICanvasIntegrated;
 
 
 export default ASCIICanvasIntegrated;
